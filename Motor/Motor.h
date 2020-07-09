@@ -1,31 +1,29 @@
-#include "Bobina.h"
+#include "Pulso.h"
 #include <Util.h>
+#define VALOR_MIN_TEMP_RADIADOR 0
+#define VALOR_MAX_TEMP_RADIADOR 125
+
 #define TEMPO_TIMER1 1000
 class Motor{ 
 
 private:
-	Bobina * bobina; 
+	Pulso * pulso; 
 	Util util;
 	double rpm;
-        uint8_t PinNivelAguaRadiador;
-        uint8_t PinStatusVentiladorRadiador;
+	double velocidade;
 	uint8_t PinTemperaturaAguaRadiador;
 
    public:
 
-        Motor(uint8_t pinRotacao,uint8_t pinNivelAguaRadiador,uint8_t 	pinStatusVentiladorRadiador,uint8_t pinTemperaturaAguaRadiador){
-
+        Motor(uint8_t pinRotacao,uint8_t pinVelocidade,uint8_t pinTemperaturaAguaRadiador){
+	
 		pinMode(pinRotacao, INPUT_PULLUP);
-		pinMode(pinNivelAguaRadiador, INPUT);
-		pinMode(pinStatusVentiladorRadiador, INPUT);
 		pinMode(pinTemperaturaAguaRadiador, INPUT);
 		
-		PinNivelAguaRadiador = pinNivelAguaRadiador;
-		PinStatusVentiladorRadiador = pinStatusVentiladorRadiador;
 		PinTemperaturaAguaRadiador = pinTemperaturaAguaRadiador;
-		
-		bobina = new Bobina(pinRotacao);
-		
+
+		//Punso de interrupção Rotação e Velocidade
+		pulso = new Pulso(pinRotacao,pinVelocidade);
 		util.iniciaTimer1(1000);
 	
 	};
@@ -34,11 +32,10 @@ private:
 				
 		if (util.saidaTimer1()){
 		
-			float multiplicador = 1000/util.getTempoEsperaTimer1();
-			long pulso = bobina->getPulso();
-			bobina->reiniciar();
+			long countPulso = pulso->getPulsoRpm();
+			pulso->reiniciarRpm();
 			util.reIniciaTimer1();	
-			rpm = pulso*60; // Segudo ---> Minuto
+			rpm = countPulso*60; // Segudo ---> Minuto
 
 		}
 
@@ -46,24 +43,33 @@ private:
 
 	}
     
+	double obterVelocidade(){
+				
+		if (util.saidaTimer1()){
 
-	int obterNivelAguaRadiador(){
+			double diametroRoda = 60; // cm
+			double countPulso = pulso->getPulsoVelocidade();
+			pulso->reiniciarVelocidade();
+			util.reIniciaTimer1();
+			double perimetro = diametroRoda * PI;// cm	
+			double distanciaPercorrida = perimetro * countPulso; // cm
+							// cm ---> m ---> km
+			velocidade = (distanciaPercorrida/100/1000)*60*60;
+								 	// s ---> min ---> h
 
-		analogWrite(PinNivelAguaRadiador, 0);
+		}
 
-		return 1;	
+		return velocidade;
+
 	}
-	uint8_t obterStatusVentiladorRadiador(){
-
-		analogWrite(PinStatusVentiladorRadiador, 0);
-
-		return 1;	
-	}
+    
 	int obterTemperaturaAguaRadiador(){
 
-		analogWrite(PinTemperaturaAguaRadiador, 0);
+		int sensorTemperaturaRadiador = analogRead(PinTemperaturaAguaRadiador);
 
-		return 1;	
+	        int temperatura  = map(sensorTemperaturaRadiador, 0, 1023, VALOR_MIN_TEMP_RADIADOR, VALOR_MAX_TEMP_RADIADOR);			
+
+		return temperatura;	
 	}
 
 };
