@@ -16,9 +16,9 @@ class Pulso : public Interrupt{
       pinMode(pinRotacao, INPUT_PULLUP);
       pinMode(pinVelocidade, INPUT_PULLUP);
 
-      attach(digitalPinToInterrupt(pinRotacao), FALLING);
+      attach(pinRotacao, FALLING);
 
-      attach(digitalPinToInterrupt(pinVelocidade), FALLING);
+      attach(pinVelocidade, FALLING);
     }
 
     long getPulsoRpm(){

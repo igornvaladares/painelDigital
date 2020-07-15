@@ -4,13 +4,14 @@
 class RealDash
 {
 	public:	    
+
        	SoftwareSerial * MinhaSerial; 
 	
 	RealDash(uint8_t pinRX, uint8_t pinTX){
 		
 		MinhaSerial = new SoftwareSerial(pinRX,pinTX); // RX, TX
 		MinhaSerial->begin(115200);  
-	};
+	}
 
 	
 	 void SendCANFrameToSerial(unsigned long canFrameId, const byte* frameData){
@@ -43,8 +44,8 @@ class RealDash
 	  }
 	}
 
-	
 
+	
 };
 
 

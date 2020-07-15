@@ -34,7 +34,7 @@ private:
 		
 			long countPulso = pulso->getPulsoRpm();
 			pulso->reiniciarRpm();
-			util.reIniciaTimer1();	
+			
 			rpm = countPulso*60; // Segudo ---> Minuto
 
 		}
@@ -44,13 +44,12 @@ private:
 	}
     
 	double obterVelocidade(){
-				
-		if (util.saidaTimer1()){
 
+		if (util.saidaTimer1()){
+			util.reIniciaTimer1();	// << VERIFICAR 
 			double diametroRoda = 60; // cm
-			double countPulso = pulso->getPulsoVelocidade();
+			long countPulso = pulso->getPulsoVelocidade();
 			pulso->reiniciarVelocidade();
-			util.reIniciaTimer1();
 			double perimetro = diametroRoda * PI;// cm	
 			double distanciaPercorrida = perimetro * countPulso; // cm
 							// cm ---> m ---> km

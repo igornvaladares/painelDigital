@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RealDashCAN version="2">
+  <!-- baseId [optional] is added to each frame canId. -->
+  <!-- frames baseId="3200" -->
+  <frames>
+    <frame id="3200">
+      <value targetId="37" units="RPM" offset="0" length="2"></value>  <!-- RPM -->
+      <value targetId="64" units="KM/H" offset="2" length="2"></value>  <!-- Velocidade -->
+      <value targetId="14" units="C" offset="4" length="2"></value>  <!-- Temperatura Radiador -->
+      <value targetId="170" units="%" offset="6" length="2"></value>  <!-- Nivel Combustivel -->
+    </frame>
+
+    <frame id="3201">
+      <value name="SetaDireita" startbit="0" bitcount="1"></value>
+      <value name="SetaEsquerda" startbit="1" bitcount="1"></value>
+      <value name="PiscaAlerta" startbit="2" bitcount="1"></value>
+      <value name="FarolAlto" startbit="3" bitcount="1"></value>
+      <value name="FarolBaixo" startbit="4" bitcount="1"></value>
+      <value name="NeblicaTraseita" startbit="5" bitcount="1"></value>
+      <value name="NeblinaFrontal" startbit="6" bitcount="1"></value>
+      <value name="TemperaturaAlta" startbit="7" bitcount="1"></value>
+      <value name="CombustivelBaixo" startbit="8" bitcount="1"></value>
+    </frame>
+     <frame id="3202">    
+           <value targetId="200" offset="0" length="1"  conversion="V-1"></value>  <!-- Marcha Selecionada -->
+	   <value targetId="42" units="%" offset="2" length="2"></value> <!-- Posição Borboleta -->
+	   <value name="Mensagens" offset="4" units="text"></value> <!-- Mensagem -->         
+     </frame>
+
+  </frames>
+</RealDashCAN>
+
+
