@@ -22,6 +22,7 @@ Util util;
 
 
 
+
 void setup(void)
 {
   Serial.begin(2000000);
@@ -31,15 +32,21 @@ void loop()
 {
   
  int rpm; 
+ int km;
  int velocidade;
  int temperatura;
  int marcha;
  int nivelCombustivel;
  int tps;
  int sensores;
+ 
   
  rpm = motor.obterRpm();
+ 
+ km = motor.obterOdometro();
+ 
  velocidade = motor.obterVelocidade();
+ 
  temperatura = motor.obterTemperaturaAguaRadiador();
 
  //Serial.println(rpm); 
