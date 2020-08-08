@@ -5,6 +5,9 @@ class Util{
 private:
    unsigned long Tempo1 = 0;
    unsigned long Delay1 = 0;
+   unsigned long Tempo2 = 0;
+   unsigned long Delay2 = 0;
+
 public:
 	Util()
 	{
@@ -39,6 +42,28 @@ public:
 	}      
    
    
+	void iniciaTimer2(unsigned long delay) {
+
+		Delay2 = delay;
+	
+	}
+
+	void reIniciaTimer2() {
+
+	    Tempo2 = millis();   
+		
+	}
+
+	bool saidaTimer2() {
+
+	    if ((millis() - Delay2) > Tempo2) { 
+		
+			return true;
+
+		}else return false;
+	}      
+   
+
 };
  
  

@@ -1,6 +1,6 @@
 #include "Pulso.h"
 #include "EEPROM.h"
-#include <Util.h>
+#include "Util.h"
 #define VALOR_MIN_TEMP_RADIADOR 0
 #define VALOR_MAX_TEMP_RADIADOR 125
 #define ENDERECO_ODOMETRO 0
@@ -13,8 +13,9 @@ private:
 	double rpm;
 	double velocidade;
 	long KM;
-	long distanciaPercorrida1Segundo;
+	long KMPercorrida1Segundo;
 	uint8_t PinTemperaturaAguaRadiador;
+	int temperatura;
 
    public:
 
@@ -31,20 +32,20 @@ private:
 		byte h =  EEPROM.read(ENDERECO_ODOMETRO);
 		byte l =  EEPROM.read(ENDERECO_ODOMETRO+1);
 		KM = word(h,l);
-
-		util.iniciaTimer1(1000);
+		util.iniciaTimer1(TIMER_1); // Iniciar timer1 para controle de 'delay'
+		util.iniciaTimer2(TIMER_2); // Iniciar timer2 para controle de 'delay'    
 	
 	};
 
        double obterRpm(){
 				
 		if (util.saidaTimer1()){
-		
 			long countPulso = pulso->getPulsoRpm();
 			pulso->reiniciarRpm();
 			
 			rpm = countPulso*60; // Segudo ---> Minuto
 
+			
 		}
 
 		return rpm;
@@ -54,17 +55,18 @@ private:
 	long obterOdometro(){
 
 		if (util.saidaTimer1()){
+			util.reIniciaTimer1();	
 			double diametroRoda = 60; // cm
 			long countPulso = pulso->getPulsoVelocidade();
 
-			util.reIniciaTimer1();	// << VERIFICAR 
 			pulso->reiniciarVelocidade();
 			
-			double perimetro = diametroRoda * PI;// cm	
-			KM=+(perimetro * countPulso/100/1000); 
-			
-			distanciaPercorrida1Segundo = (perimetro * countPulso/100/1000);
+			double perimetro = diametroRoda * PI;// cm
+	
+			KMPercorrida1Segundo = (perimetro * countPulso/100/1000);
 
+			KM=+KMPercorrida1Segundo; 
+			
 			byte h = highByte(KM);
 			byte l = lowByte(KM);
 
@@ -81,9 +83,10 @@ private:
 
 	int obterTemperaturaAguaRadiador(){
 
-		int sensorTemperaturaRadiador = analogRead(PinTemperaturaAguaRadiador);
+		if (util.saidaTimer2()){
 
-	        int temperatura  = map(sensorTemperaturaRadiador, 0, 1023, VALOR_MIN_TEMP_RADIADOR, VALOR_MAX_TEMP_RADIADOR);			
+			temperatura  = map(analogRead(PinTemperaturaAguaRadiador), 0, 1023, VALOR_MIN_TEMP_RADIADOR, VALOR_MAX_TEMP_RADIADOR);			
+		}
 
 		return temperatura;	
 	}
@@ -93,7 +96,7 @@ private:
 
 	double obterVelocidade(){
 
-		return distanciaPercorrida1Segundo*60*60;
+		return KMPercorrida1Segundo*60*60;
 
 
 	}

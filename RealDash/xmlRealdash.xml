@@ -11,41 +11,44 @@
     </frame>
 
     <frame id="3201">
-      <value name="BateriaBaixa" startbit="0" bitcount="1"></value>
+      <value name="Bateria" startbit="0" bitcount="1"></value>
       <value name="Cambio" startbit="1" bitcount="1"></value>
       <value name="OleoBaixo" startbit="2" bitcount="1"></value>
       <value name="Injecao" startbit="3" bitcount="1"></value>
       <value name="FreioEstacionamento" startbit="4" bitcount="1"></value>
       <value name="Pastilha" startbit="5" bitcount="1"></value>
-      <value name="Triangulo1" startbit="6" bitcount="1"></value>
+      <value name="imobilizador" startbit="6" bitcount="1"></value>
+
 
       <value name="SetaDireita" startbit="7" bitcount="1"></value>
       <value name="SetaEsquerda" startbit="8" bitcount="1"></value>
       <value name="FarolAlto" startbit="9" bitcount="1"></value>
-      <value name="FarolBaixo" startbit="10" bitcount="1"></value>
-      <value name="NeblicaTraseita" startbit="11" bitcount="1"></value>
-      <value name="NeblinaFrontal" startbit="12" bitcount="1"></value>
-      <value name="TemperaturaAlta" startbit="13" bitcount="1"></value>
-      <value name="CombustivelBaixo" startbit="14" bitcount="1"></value>
+      <value name="NeblicaTraseita" startbit="10" bitcount="1"></value>
+      <value name="NeblinaFrontal" startbit="11" bitcount="1"></value>
 
-      <value name="Cinto" startbit="5" bitcount="15"></value>
-      <value name="Cruise" startbit="5" bitcount="16"></value>
-      <value name="LampadaQueimanda" startbit="17" bitcount="1"></value>
-      <value name="DirecaoEletrica" startbit="18" bitcount="1"></value>
-      <value name="Triangulo2" startbit="19" bitcount="1"></value>
-      <value name="exclamacao" startbit="20" bitcount="1"></value>
+      <value name="TemperaturaAlta" startbit="12" bitcount="1"></value>
+      <value name="CombustivelBaixo" startbit="13" bitcount="1"></value>
+
+      <value name="Cinto" startbit="5" bitcount="14"></value>
+      <value name="Cruise" startbit="5" bitcount="15"></value>
+      <value name="LampadaQueimanda" startbit="16" bitcount="1"></value>
+      <value name="DirecaoEletrica" startbit="17" bitcount="1"></value>
+      <value name="Triangulo" startbit="18" bitcount="1"></value>
+      <value name="PartidaFrio" startbit="19" bitcount="1"></value>
+      <value name="FarolBaixo" startbit="20" bitcount="1"></value>
 
       <value name="PortaDE" startbit="21" bitcount="1"></value>
       <value name="PortaDD" startbit="22" bitcount="1"></value>
       <value name="PortaTD" startbit="23" bitcount="1"></value>
       <value name="PortaTE" startbit="24" bitcount="1"></value>
       <value name="PortaMala" startbit="25" bitcount="1"></value>
+
       <value name="Capoo" startbit="26" bitcount="1"></value>
 
     </frame>
      <frame id="3202">    
            <value targetId="200" offset="0" length="1"  conversion="V-1"></value>  <!-- Marcha Selecionada -->
-	   <value targetId="42" units="%" offset="2" length="2"></value> <!-- Posição Borboleta -->
+	   <value targetId="151" units="%" offset="2" length="2"></value> <!-- Pressão Dualogic -->
 	   <value name="Mensagens" offset="4" units="text"></value> <!-- Mensagem -->         
      </frame>
 
