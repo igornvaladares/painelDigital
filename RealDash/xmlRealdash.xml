@@ -11,39 +11,44 @@
     </frame>
 
     <frame id="3201">
-      <value name="Bateria" startbit="0" bitcount="1"></value>
-      <value name="Cambio" startbit="1" bitcount="1"></value>
-      <value name="OleoBaixo" startbit="2" bitcount="1"></value>
-      <value name="Injecao" startbit="3" bitcount="1"></value>
-      <value name="FreioEstacionamento" startbit="4" bitcount="1"></value>
-      <value name="Pastilha" startbit="5" bitcount="1"></value>
-      <value name="imobilizador" startbit="6" bitcount="1"></value>
+
+      <value name="PortaDE" startbit="0" bitcount="1"></value>
+      <value name="PortaDD" startbit="1" bitcount="1"></value>
+      <value name="PortaTD" startbit="2" bitcount="1"></value>
+      <value name="PortaTE" startbit="3" bitcount="1"></value>
+      <value name="PortaMala" startbit="4" bitcount="1"></value>
+      <value name="Capoo" startbit="5" bitcount="1"></value>      
+      <value name="AlgoAberto" startbit="6" bitcount="1"></value>      
+
+      <value name="Bateria" startbit="7" bitcount="1"></value>
+      <value name="Cambio" startbit="8" bitcount="1"></value>
+     <value name="OleoBaixo" startbit="9" bitcount="1"></value>
+      <value name="Injecao" startbit="10" bitcount="1"></value>
+      <value name="FreioEstacionamento" startbit="11" bitcount="1"></value>
+      <value name="Pastilha" startbit="12" bitcount="1"></value>
+      <value name="imobilizador" startbit="13" bitcount="1"></value>
+
+      <value name="SetaDireita" startbit="14" bitcount="1"></value>
+      <value name="SetaEsquerda" startbit="15" bitcount="1"></value>
+      <value name="FarolAlto" startbit="16" bitcount="1"></value>
+      <value name="NeblicaTraseita" startbit="17" bitcount="1"></value>
+      <value name="NeblinaFrontal" startbit="18" bitcount="1"></value>
+
+      <value name="Cinto" startbit="19" bitcount="1"></value>
+      <value name="Cruise" startbit="20" bitcount="1"></value>
+      <value name="LampadaQueimanda" startbit="21" bitcount="1"></value>
+      <value name="DirecaoEletrica" startbit="22" bitcount="1"></value>
+      <value name="Triangulo" startbit="23" bitcount="1"></value>
+      <value name="PartidaFrio" startbit="24" bitcount="1"></value>
+      <value name="FarolBaixo" startbit="25" bitcount="1"></value>
+
+      
+      <value name="Esguincho" startbit="26" bitcount="1"></value>
+      <value name="NivelAguaRadiador" startbit="27" bitcount="1"></value>
+      <value name="Eletroventilador" startbit="28" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
 
 
-      <value name="SetaDireita" startbit="7" bitcount="1"></value>
-      <value name="SetaEsquerda" startbit="8" bitcount="1"></value>
-      <value name="FarolAlto" startbit="9" bitcount="1"></value>
-      <value name="NeblicaTraseita" startbit="10" bitcount="1"></value>
-      <value name="NeblinaFrontal" startbit="11" bitcount="1"></value>
 
-      <value name="TemperaturaAlta" startbit="12" bitcount="1"></value>
-      <value name="CombustivelBaixo" startbit="13" bitcount="1"></value>
-
-      <value name="Cinto" startbit="5" bitcount="14"></value>
-      <value name="Cruise" startbit="5" bitcount="15"></value>
-      <value name="LampadaQueimanda" startbit="16" bitcount="1"></value>
-      <value name="DirecaoEletrica" startbit="17" bitcount="1"></value>
-      <value name="Triangulo" startbit="18" bitcount="1"></value>
-      <value name="PartidaFrio" startbit="19" bitcount="1"></value>
-      <value name="FarolBaixo" startbit="20" bitcount="1"></value>
-
-      <value name="PortaDE" startbit="21" bitcount="1"></value>
-      <value name="PortaDD" startbit="22" bitcount="1"></value>
-      <value name="PortaTD" startbit="23" bitcount="1"></value>
-      <value name="PortaTE" startbit="24" bitcount="1"></value>
-      <value name="PortaMala" startbit="25" bitcount="1"></value>
-
-      <value name="Capoo" startbit="26" bitcount="1"></value>
 
     </frame>
      <frame id="3202">    

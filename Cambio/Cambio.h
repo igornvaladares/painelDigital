@@ -3,7 +3,7 @@
 #define VALOR_MAX_REFERENCIA_SENSOR 478
 
 #define VALOR_MIN_REFERENCIA_SENSOR_PRESSAO 0
-#define VALOR_MAX_REFERENCIA_SENSOR_PRESSAO 450
+#define VALOR_MAX_REFERENCIA_SENSOR_PRESSAO 100
 
 class Cambio
 {
@@ -13,20 +13,20 @@ class Cambio
         uint8_t PinEngate;
 	uint8_t PinPressaoDualogic;
 
-        signed char calcularMarcha(int valorSelecao, int valorEngate){
+	signed char calcularMarcha(int valorSelecao, int valorEngate){
               
 		signed char marcha= 1; // Neutro
 		switch (valorSelecao) {
 			 case 0 ... 199: // EM CIMA
 				switch (valorEngate) {
 					 case 0 ... 199: // DIREITA
-					 	marcha= 0; // Ré
+					 	marcha= 5; //  5 - Marcha
 					 break;
 					 case 200 ... 299:
 					 	marcha= 1;  // NEUTRO
 					 break;
 					 case 300 ... 500: //  ESQUEDA
-					 	marcha= 6; // 5 - Marcha
+					 	marcha= 0; // Ré
 					 break;
 				}
 			 break;
@@ -91,7 +91,10 @@ class Cambio
 
 	 int obterPressaoDualogic(){
 
-		return map(analogRead(PinPressaoDualogic), 0, 1023, VALOR_MIN_REFERENCIA_SENSOR_PRESSAO, VALOR_MAX_REFERENCIA_SENSOR_PRESSAO);			
+		float voltPorUnidade = 0.004887586;
+         	return map(analogRead(PinPressaoDualogic), 0, 1023, VALOR_MIN_REFERENCIA_SENSOR_PRESSAO, VALOR_MAX_REFERENCIA_SENSOR_PRESSAO);			
+
+
 
 	}
 

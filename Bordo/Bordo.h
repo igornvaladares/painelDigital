@@ -1,14 +1,27 @@
 #include "Arduino.h"
 #define VALOR_MIN_NIVEL_COMBUSTIVEL 0
 #define VALOR_MAX_NIVEL_COMBUSTIVEL 100
+#define VOLT_TANQUE_VAZIO 6.85
+#define VOLT_TANQUE_CHEIO 0.72
 #define ENDERECO_COMBUSTIVEL 2
+/*
+Mega
+#define PIN_INI 22 // 
+PIN 28 "NAO USAR POIS é apenas de indicação no .xml para o RealDash( AlgoAberto) "
+#define PIN_FIM 49
+*/
+#define PIN_INI 4
+#define PIN_FIM 10
+
+#define PIN_PORTAS PIN_INI + 6
+
 class Bordo{ 
 
 private:
 	Util util;
 	uint8_t PinNivelCombustivel;
 	
-	const uint8_t desvioCombustivel = 2;
+	const uint8_t desvioCombustivel = 0;
 	
 	int nivelMemoria = 0; //Inicial
    public:
@@ -19,22 +32,44 @@ private:
 		PinNivelCombustivel = pinNivelCombustivel;
 
 		obterNivelCombustivel();
-		pinMode(2, INPUT);
+		util.iniciaTimer3(TIMER_3); // Iniciar timer2 para controle de 'delay'    
+
+		for (int i=PIN_INI; i<PIN_FIM; i++) {
+
+			pinMode(i,INPUT_PULLUP);
+	
+		}
 
 	};
 
 	int obterNivelCombustivel(){
 
-		if (util.saidaTimer2()){
+		/*
+		COMBUSTIVEL (VERIFICAR)
+		Cheio: 33 ± 4 ohms | 0.723 Volts
+		Vazio: 313 ± 4 ohms | 6.81
+		233 -> 5.1 Volts
+		*/
 
-			util.reIniciaTimer2();	
-			int sensorNivelCombustivel =0;
-			
-			sensorNivelCombustivel = analogRead(PinNivelCombustivel);
+		if (util.saidaTimer3()){
 
-			int nivelAtual = map(sensorNivelCombustivel, 0, 1023, VALOR_MIN_NIVEL_COMBUSTIVEL, VALOR_MAX_NIVEL_COMBUSTIVEL);			
-			
+			float R1 = 30000;
+			float R2 = 7500;
+			float voltPorUnidade = 0.004887586;
+			int nivelAtual=0;			
+			float sensorNivelCombustivel=0; 
+		
+			float sensorNivelCombustivel_Aux =0;
+			//(0-5)			
+			sensorNivelCombustivel_Aux = analogRead(PinNivelCombustivel);
+			//(0-25)
+			if (sensorNivelCombustivel_Aux>0){
+				sensorNivelCombustivel =  sensorNivelCombustivel_Aux / (R2/(R1+R2));
+				nivelAtual = map((sensorNivelCombustivel*voltPorUnidade),VOLT_TANQUE_VAZIO ,VOLT_TANQUE_CHEIO , 						            VALOR_MIN_NIVEL_COMBUSTIVEL,VALOR_MAX_NIVEL_COMBUSTIVEL);			
+			}else nivelAtual = 0;
+
 			if (nivelMemoria==0) nivelMemoria = nivelAtual;
+
 
 
 			if (nivelAtual < (nivelMemoria - desvioCombustivel)){
@@ -49,29 +84,41 @@ private:
 
 				}
 			}
-			
+			//	Serial.println(PIN_PORTAS);
 
-
+			util.reIniciaTimer3();	
 		}
-		
+
 		return nivelMemoria;	
 
 
 	}
 
+	//Retorna o valor numerico correspondente ao binario das portas ON OFF
+	// Ex. 00100 = 4 ( Porta 2)
+ 	// Ex. 00110 = 5 ( Portas 1 e 2)
+	unsigned long obterSensoresDigitais(){
 
-	int obterSensoresDigitais(){
-
-		  int digitalPins = 0;
+		  unsigned long digitalPins = 0;
 		  int bitposition = 0;
-					
-		  for (int i=22; i<49; i++) {
+		  bool algoAberto = false; //4 Portas, Porta-Mala ou Capoo (bits[0 - 5] do .xml ) 
+	          
+		  //2^0,2^1,2^2,2^3,2^4 ... ATÉ 2^30  (.XML)
+		  for (int i=PIN_INI; i<=PIN_FIM; i++) {
 		    
-			if (digitalRead(i) == LOW) digitalPins |= (1 << bitposition);
+			if (digitalRead(i) == LOW){
+				digitalPins |= (1 << bitposition);
+				if (i<PIN_PORTAS)
+				   algoAberto = true; 
+			}
 			bitposition++;
-		  }
+		  
 
-		  return digitalPins;	
+
+		  }
+		  //2^6 
+		  if (algoAberto) digitalPins |= (1 << (bitposition -1));
+		  return digitalPins;
 
 	}    
 

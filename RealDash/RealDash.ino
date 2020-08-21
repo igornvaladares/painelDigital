@@ -1,35 +1,26 @@
+#define TIMER_1 986 // Um segundo ( RPM, Velocidade,Odometro
+#define TIMER_2 0 // 2 segundos ( nivel temperatura)
+#define TIMER_3 0 // 5 segundos ( temperatura)
 #include <Motor.h>
 #include <Cambio.h>
 #include <Bordo.h>
 #include <RealDash.h>
 
-
 RealDash realDash(11,12); // RX, TX
-// Porta Analogica de Seleção e Engate
-Cambio cambio(A0,A1);
-// Porta de Comunicação
-
-/*
-
-Portas:
-uint8_t pinRotacao, (interrupção)
-uint8_t pinVelocidade, (interrupção)
-uint8_t pinTemperaturaAguaRadiador
-*/
-Motor motor(0,1,A2);
-Bordo bordo(A3);
-Util util;
-
-
+Cambio cambio(A0,A1, A3); //Porta Analogica de Seleção , Engate e pressao dualogic
+Motor motor(digitalPinToInterrupt(2),digitalPinToInterrupt(3),A4);//uint8_t pinRotacao, (interrupção) uint8_t pinVelocidade, (interrupção) uint8_t pinTemperaturaAguaRadiador
+Bordo bordo(A5);//uint8_t pinNivelCombustível
 
 
 void setup(void)
 {
-  Serial.begin(2000000);
+     
+  Serial.begin(9600);
   
 }
 void loop()
 {
+     
   
  int rpm; 
  int km;
@@ -37,31 +28,35 @@ void loop()
  int temperatura;
  int marcha;
  int nivelCombustivel;
- int tps;
- int sensores;
+ int pressaoDualogic;
+ unsigned long sensores;
  
-  
- rpm = motor.obterRpm();
+ //----------------------------<Digitais>----------------------------
+ rpm = motor.obterRpm(); 
  
  km = motor.obterOdometro();
- 
+  
  velocidade = motor.obterVelocidade();
  
+ sensores = bordo.obterSensoresDigitais();
+ //----------------------------</Digitais>----------------------------
+ 
+ //----------------------------<Analogicos>----------------------------
  temperatura = motor.obterTemperaturaAguaRadiador();
-
- //Serial.println(rpm); 
- //Serial.println(velocidade); 
  
  marcha = cambio.obterMarchaEngatada();
- sensores = bordo.obterSensores();
- //velocidade=90;
- nivelCombustivel=40;// %
- temperatura = 90; // Graus
- tps = 25;// %
+
+ pressaoDualogic = cambio.obterPressaoDualogic();
  
+ nivelCombustivel = bordo.obterNivelCombustivel(); // reinicia o (TIMER2)
+ //----------------------------</Analogicos>----------------------------
+ 
+  //rpm = 3000;
+//Serial.print("COMBUSTIVEL:");
+//Serial.println(nivelCombustivel); 
+
  enviarParaRealDash(rpm, velocidade, temperatura,nivelCombustivel, 
-                    marcha,tps,
-                    sensores);
+                    marcha,pressaoDualogic,sensores);
  
  
 }
@@ -70,8 +65,8 @@ void loop()
 
 void enviarParaRealDash(unsigned int rpm, unsigned int velocidade,
                         unsigned int tempMotor, unsigned int nivelCombustivel, 
-                        signed char marchaEngatada,unsigned int tps,
-                        unsigned int sensores){
+                        signed char marchaEngatada,unsigned int pressaoDualogic,
+                        unsigned long sensores){
   
   byte buf[8];
 
@@ -88,10 +83,14 @@ void enviarParaRealDash(unsigned int rpm, unsigned int velocidade,
   realDash.SendCANFrameToSerial(3201, buf);
  
   memcpy(buf, &marchaEngatada, 2);
-  memcpy(buf + 2, &tps, 2);
+  memcpy(buf + 2, &pressaoDualogic, 2);
   realDash.SendCANFrameToSerial(3202, buf);
 
-  //tratarMensagens();
+  
+  //Serial.print("sensores:");
+  //Serial.println(sensores);
+  
+  tratarMensagens();
   
 }
 
@@ -111,42 +110,10 @@ void tratarMensagens(){
    
    const char* msg20 =  "Cruise Control";
 
-   realDash.SendTextExtensionFrameToSerial(3202, msg1);
+   //realDash.SendTextExtensionFrameToSerial(3202, msg1);
+
+   
    
 
    
 } 
-/*
-
- void SendCANFrameToSerial(unsigned long canFrameId, const byte* frameData)
-{
-  // the 4 byte identifier at the beginning of each CAN frame
-  // this is required for RealDash to 'catch-up' on ongoing stream of CAN frames
-  const byte serialBlockTag[4] = { 0x44, 0x33, 0x22, 0x11 };
-  MinhaSerial.write(serialBlockTag, 4);
-
-  // the CAN frame id number (as 32bit little endian value)
-  MinhaSerial.write((const byte*)&canFrameId, 4);
-
-  // CAN frame payload
-  MinhaSerial.write(frameData, 8);
-}
-
-
-void SendTextExtensionFrameToSerial(unsigned long canFrameId, const char* text)
-{
-  if (text)
-  {
-    // the 4 byte identifier at the beginning of each CAN frame
-    // this is required for RealDash to 'catch-up' on ongoing stream of CAN frames
-    const byte textExtensionBlockTag[4] = { 0x55, 0x33, 0x22, 0x11 };
-    MinhaSerial.write(textExtensionBlockTag, 4);
-
-    // the CAN frame id number (as 32bit little endian value)
-    MinhaSerial.write((const byte*)&canFrameId, 4);
-
-    // text payload
-    MinhaSerial.write(text, strlen(text) + 1);
-  }
-}
-*/

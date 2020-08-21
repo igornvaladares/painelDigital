@@ -1,10 +1,9 @@
 #include "Pulso.h"
 #include "EEPROM.h"
 #include "Util.h"
-#define VALOR_MIN_TEMP_RADIADOR 0
-#define VALOR_MAX_TEMP_RADIADOR 125
+#define VALOR_MIN_TEMP_RADIADOR 20
+#define VALOR_MAX_TEMP_RADIADOR 120
 #define ENDERECO_ODOMETRO 0
-#define TEMPO_TIMER1 1000
 class Motor{ 
 
 private:
@@ -33,7 +32,7 @@ private:
 		byte l =  EEPROM.read(ENDERECO_ODOMETRO+1);
 		KM = word(h,l);
 		util.iniciaTimer1(TIMER_1); // Iniciar timer1 para controle de 'delay'
-		util.iniciaTimer2(TIMER_2); // Iniciar timer2 para controle de 'delay'    
+		util.iniciaTimer2(TIMER_2); // Iniciar timer1 para controle de 'delay'
 	
 	};
 
@@ -84,8 +83,24 @@ private:
 	int obterTemperaturaAguaRadiador(){
 
 		if (util.saidaTimer2()){
+			//OBS: Meio do Tanque a partir de 0,74 Volts e ventoinha liga a partir de 0.59v	
 
-			temperatura  = map(analogRead(PinTemperaturaAguaRadiador), 0, 1023, VALOR_MIN_TEMP_RADIADOR, VALOR_MAX_TEMP_RADIADOR);			
+			 //2.82 > 26 graus (Refenrencia)			
+		         //1.9 -> 45 graus 		
+			 //0.94 -> 75 graus 
+
+			///2.5 -> 30
+			// 1.3 -> 60 graau
+			// 0.6 -> 100 graus
+			
+			//3.75 -> 20 graus * 0.004887586 = 781
+			//3.11 -> 24 graus =
+			//0.48 -> 120 graus * 0.004887586 = 100
+
+			//float voltPorUnidade = 0.004887586;
+			temperatura  = map(analogRead(PinTemperaturaAguaRadiador), 781, 100, VALOR_MIN_TEMP_RADIADOR, VALOR_MAX_TEMP_RADIADOR);			
+			//Serial.println("temperatura");		
+			util.reIniciaTimer2();
 		}
 
 		return temperatura;	
