@@ -11,8 +11,8 @@ private:
 	Util util;
 	double rpm;
 	double velocidade;
-	long KM;
-	long KMPercorrida1Segundo;
+	double KM=0;
+	double KMPercorrida1Segundo;
 	uint8_t PinTemperaturaAguaRadiador;
 	int temperatura;
 
@@ -30,7 +30,7 @@ private:
 		
 		byte h =  EEPROM.read(ENDERECO_ODOMETRO);
 		byte l =  EEPROM.read(ENDERECO_ODOMETRO+1);
-		KM = word(h,l);
+		//KM = word(h,l);
 		util.iniciaTimer1(TIMER_1); // Iniciar timer1 para controle de 'delay'
 		util.iniciaTimer2(TIMER_2); // Iniciar timer1 para controle de 'delay'
 	
@@ -51,7 +51,7 @@ private:
 
 	}
 
-	long obterOdometro(){
+	double obterOdometro(){
 
 		if (util.saidaTimer1()){
 			util.reIniciaTimer1();	
@@ -63,14 +63,14 @@ private:
 			double perimetro = diametroRoda * PI;// cm
 	
 			KMPercorrida1Segundo = (perimetro * countPulso/100/1000);
-
-			KM=+KMPercorrida1Segundo; 
+			KM += KMPercorrida1Segundo; 
 			
-			byte h = highByte(KM);
-			byte l = lowByte(KM);
+			//byte h = highByte(KM);
+			//byte l = lowByte(KM);
 
-			EEPROM.write(ENDERECO_ODOMETRO, h);
-			EEPROM.write(ENDERECO_ODOMETRO+1, l);
+			//EEPROM.write(ENDERECO_ODOMETRO, h);
+			//EEPROM.write(ENDERECO_ODOMETRO+1, l);
+
 
 
 		}

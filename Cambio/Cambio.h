@@ -20,7 +20,7 @@ class Cambio
 			 case 0 ... 199: // EM CIMA
 				switch (valorEngate) {
 					 case 0 ... 199: // DIREITA
-					 	marcha= 5; //  5 - Marcha
+					 	marcha= 6; //  5 - Marcha
 					 break;
 					 case 200 ... 299:
 					 	marcha= 1;  // NEUTRO

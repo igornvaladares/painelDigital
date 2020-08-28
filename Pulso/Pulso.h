@@ -1,4 +1,5 @@
 #include "MyInterrupts.h"
+
 class Pulso : public Interrupt{
   private:
 
@@ -19,6 +20,7 @@ class Pulso : public Interrupt{
       attach(pinRotacao, FALLING);
 
       attach(pinVelocidade, FALLING);
+
     }
 
     long getPulsoRpm(){

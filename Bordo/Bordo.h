@@ -1,18 +1,13 @@
 #include "Arduino.h"
 #define VALOR_MIN_NIVEL_COMBUSTIVEL 0
 #define VALOR_MAX_NIVEL_COMBUSTIVEL 100
-#define VOLT_TANQUE_VAZIO 6.85
+#define VOLT_TANQUE_VAZIO 5.60
 #define VOLT_TANQUE_CHEIO 0.72
 #define ENDERECO_COMBUSTIVEL 2
-/*
-Mega
-#define PIN_INI 22 // 
-PIN 28 "NAO USAR POIS é apenas de indicação no .xml para o RealDash( AlgoAberto) "
+//Mega
+#define PIN_INI 22  
+//PIN 28 "NAO USAR POIS é apenas de indicação no .xml para o RealDash( AlgoAberto) "
 #define PIN_FIM 49
-*/
-#define PIN_INI 4
-#define PIN_FIM 10
-
 #define PIN_PORTAS PIN_INI + 6
 
 class Bordo{ 
@@ -34,7 +29,7 @@ private:
 		obterNivelCombustivel();
 		util.iniciaTimer3(TIMER_3); // Iniciar timer2 para controle de 'delay'    
 
-		for (int i=PIN_INI; i<PIN_FIM; i++) {
+		for (int i=PIN_INI; i<=PIN_FIM; i++) {
 
 			pinMode(i,INPUT_PULLUP);
 	
@@ -47,7 +42,7 @@ private:
 		/*
 		COMBUSTIVEL (VERIFICAR)
 		Cheio: 33 ± 4 ohms | 0.723 Volts
-		Vazio: 313 ± 4 ohms | 6.81
+		Vazio: 313 ± 4 ohms | 5.6 volts
 		233 -> 5.1 Volts
 		*/
 
@@ -97,19 +92,21 @@ private:
 	//Retorna o valor numerico correspondente ao binario das portas ON OFF
 	// Ex. 00100 = 4 ( Porta 2)
  	// Ex. 00110 = 5 ( Portas 1 e 2)
-	unsigned long obterSensoresDigitais(){
+	unsigned long long int obterSensoresDigitais(){
 
-		  unsigned long digitalPins = 0;
+		  unsigned long long int digitalPins = 0;
 		  int bitposition = 0;
 		  bool algoAberto = false; //4 Portas, Porta-Mala ou Capoo (bits[0 - 5] do .xml ) 
 	          
 		  //2^0,2^1,2^2,2^3,2^4 ... ATÉ 2^30  (.XML)
+			//	22	  49	
 		  for (int i=PIN_INI; i<=PIN_FIM; i++) {
 		    
 			if (digitalRead(i) == LOW){
 				digitalPins |= (1 << bitposition);
-				if (i<PIN_PORTAS)
+				if (i<PIN_PORTAS){
 				   algoAberto = true; 
+				}
 			}
 			bitposition++;
 		  
@@ -117,7 +114,7 @@ private:
 
 		  }
 		  //2^6 
-		  if (algoAberto) digitalPins |= (1 << (bitposition -1));
+		  if (algoAberto) digitalPins |= (1 << (PIN_PORTAS - PIN_INI));
 		  return digitalPins;
 
 	}    
