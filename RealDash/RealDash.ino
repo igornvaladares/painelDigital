@@ -1,8 +1,12 @@
 //#include <PriUint64.h>
+#define ENDERECO_ODOMETRO 0
+#define ENDERECO_MODOAUTOMATICO 2
+
 #include <avr/sleep.h>
 #define TIMER_1 986 // Um segundo ( RPM, Velocidade,Odometro
-#define TIMER_2 0 // 2 segundos ( nivel temperatura)
-#define TIMER_3 0 // 5 segundos ( temperatura)
+#define TIMER_2 0 // leitura de 2 em 2 segundos ( nivel temperatura)
+#define TIMER_3 0 // leitura de 5 em 5 segundos ( temperatura)
+#define TIMER_4 1000 // se demorar 1 segundo, alternar modo automativo < - >  Manual
 #include <Motor.h>
 #include <Cambio.h>
 #include <Bordo.h>
@@ -17,18 +21,16 @@
 //Mega 2, 3, 18, 19, 20, 21    
                              
 RealDash realDash(&Serial,230400); 
-Cambio cambio(A0,A1,A2); //Porta Analogica de Seleção , Engate e pressao dualogic
-Motor motor(digitalPinToInterrupt(2),digitalPinToInterrupt(3),A3);//uint8_t pinRotacao, (interrupção) uint8_t pinVelocidade, (interrupção) uint8_t pinTemperaturaAguaRadiador
-Bordo bordo(A4);//uint8_t pinNivelCombustível
-int pinPowerOffArduino=50  ; //  desligar o arduino
+Cambio cambio(A0,A1,A2,A3,A4); //Porta Analogica de Seleção , Engate e pressao dualogic, pin1Joystick , pin2Joystick 
+Motor motor(digitalPinToInterrupt(2),digitalPinToInterrupt(3),A5);//uint8_t pinRotacao, (interrupção) uint8_t pinVelocidade, (interrupção) uint8_t pinTemperaturaAguaRadiador
+Bordo bordo(A6);//uint8_t pinNivelCombustível
 
 void setup(void)
 {
- pinMode(pinPowerOffArduino, INPUT);
  
- realDash.iniciar();
+// realDash.iniciar();
   
- //Serial.begin(9600);
+ Serial.begin(9600);
 }
 void loop()
 {
@@ -42,42 +44,43 @@ void loop()
  int marcha;
  int nivelCombustivel;
  int pressaoDualogic;
- unsigned long long int sensores;
+ bool modoAutomatico;
+ unsigned long int sensores;
  
  //----------------------------<Digitais>----------------------------
  rpm = motor.obterRpm(); 
  
- //km = motor.obterOdometro();
+ km = motor.obterOdometro();
   
  velocidade = motor.obterVelocidade();
  
  sensores = bordo.obterSensoresDigitais();
+
+ //Serial.print("Sensores:");
+ //Serial.println(PriUint64<DEC>(sensores));
+ 
  //----------------------------</Digitais>----------------------------
  
  //----------------------------<Analogicos>----------------------------
+ 
+ 
  temperatura = motor.obterTemperaturaAguaRadiador();
  
  marcha = cambio.obterMarchaEngatada();
 
  pressaoDualogic = cambio.obterPressaoDualogic();
+
+ // usa o binario dos sensores para adicionar mais um bit caso estivre selecionado o modo automático
+ sensores = cambio.obterModoAutomatico(sensores);
+ 
  
  nivelCombustivel = bordo.obterNivelCombustivel(); // reinicia o (TIMER2)
  //----------------------------</Analogicos>----------------------------
  
  
-//Serial.print("COMBUSTIVEL:");
-//Serial.println(nivelCombustivel); 
+ //enviarParaRealDash(rpm, velocidade, temperatura,nivelCombustivel, 
+//                    marcha,pressaoDualogic,sensores);
 
- enviarParaRealDash(rpm, velocidade, temperatura,nivelCombustivel, 
-                    marcha,pressaoDualogic,sensores);
-
-//Serial.print("Texto:");
-
-//Serial.println(temperatura);
-//Serial.println(PriUint64<DEC>(a));
-
- 
- //powerOffArduino();
 }
 
 
@@ -85,7 +88,7 @@ void loop()
 void enviarParaRealDash(unsigned int rpm, unsigned int velocidade,
                         unsigned int temperatura, unsigned int nivelCombustivel, 
                         signed char marchaEngatada,unsigned int pressaoDualogic,
-                        unsigned long long int sensores){
+                        unsigned long int sensores){
   
   byte buf[8];
 
@@ -134,16 +137,4 @@ void tratarMensagens(){
 
    
 } 
-
-void powerOffArduino(){
-   
-    if ((digitalRead(pinPowerOffArduino)) == HIGH){
-
-        Serial.println("Dormiu");
-        sleep_enable();
-        set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-        sleep_cpu();
-
-    }
- }
  

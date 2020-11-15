@@ -3,7 +3,7 @@
 #include "Util.h"
 #define VALOR_MIN_TEMP_RADIADOR 20
 #define VALOR_MAX_TEMP_RADIADOR 120
-#define ENDERECO_ODOMETRO 0
+
 class Motor{ 
 
 private:
@@ -28,8 +28,8 @@ private:
 		//Punso de interrupção Rotação e Velocidade
 		pulso = new Pulso(pinRotacao,pinVelocidade);
 		
-		byte h =  EEPROM.read(ENDERECO_ODOMETRO);
-		byte l =  EEPROM.read(ENDERECO_ODOMETRO+1);
+		//byte h =  EEPROM.read(ENDERECO_ODOMETRO);
+		//byte l =  EEPROM.read(ENDERECO_ODOMETRO+1);
 		//KM = word(h,l);
 		util.iniciaTimer1(TIMER_1); // Iniciar timer1 para controle de 'delay'
 		util.iniciaTimer2(TIMER_2); // Iniciar timer1 para controle de 'delay'

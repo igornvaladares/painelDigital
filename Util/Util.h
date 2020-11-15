@@ -12,6 +12,9 @@ private:
    unsigned long Tempo3 = 0;
    unsigned long Delay3 = 0;
 
+   unsigned long Tempo4 = 0;
+   unsigned long Delay4 = 0;
+
 public:
 	Util()
 	{
@@ -89,6 +92,28 @@ public:
 	}      
    
 
+	void iniciaTimer4(unsigned long delay) {
+
+		Delay4 = delay;
+	    
+	}
+
+	void reIniciaTimer4() {
+
+	    Tempo4 = millis();   
+		
+	}
+
+	
+	bool saidaTimer4() {
+
+	    if ((millis() - Delay4) > Tempo4) { 
+		
+			return true;
+
+		}else return false;
+	}      
+   
 };
  
  
