@@ -1,11 +1,12 @@
-//#include <PriUint64.h>
+#include <PriUint64.h>
 #define ENDERECO_ODOMETRO 0
 #define ENDERECO_MODOAUTOMATICO 2
 
 #include <avr/sleep.h>
 #define TIMER_1 986 // Um segundo ( RPM, Velocidade,Odometro
-#define TIMER_2 0 // leitura de 2 em 2 segundos ( nivel temperatura)
-#define TIMER_3 0 // leitura de 5 em 5 segundos ( temperatura)
+//#define TIMER_1 2000 // Um segundo ( RPM, Velocidade,Odometro
+#define TIMER_2 0 // leitura de 2 em 2 segundos ( temperatura)
+#define TIMER_3 0 // leitura de 5 em 5 segundos ( nivel combustivel)
 #define TIMER_4 1000 // se demorar 1 segundo, alternar modo automativo < - >  Manual
 #include <Motor.h>
 #include <Cambio.h>
@@ -28,9 +29,9 @@ Bordo bordo(A6);//uint8_t pinNivelCombustível
 void setup(void)
 {
  
-// realDash.iniciar();
+//realDash.iniciar();
   
- Serial.begin(9600);
+Serial.begin(9600);
 }
 void loop()
 {
@@ -39,7 +40,7 @@ void loop()
  int rpm; 
  
  double km;
- int velocidade;
+ double velocidade;
  int temperatura;
  int marcha;
  int nivelCombustivel;
@@ -56,8 +57,6 @@ void loop()
  
  sensores = bordo.obterSensoresDigitais();
 
- //Serial.print("Sensores:");
- //Serial.println(PriUint64<DEC>(sensores));
  
  //----------------------------</Digitais>----------------------------
  
@@ -73,13 +72,27 @@ void loop()
  // usa o binario dos sensores para adicionar mais um bit caso estivre selecionado o modo automático
  sensores = cambio.obterModoAutomatico(sensores);
  
+ //Serial.print("Sensores:");
+ //Serial.println(PriUint64<DEC>(sensores));
  
  nivelCombustivel = bordo.obterNivelCombustivel(); // reinicia o (TIMER2)
  //----------------------------</Analogicos>----------------------------
+ //Serial.print("combustivel:");
+ //Serial.println(nivelCombustivel);
  
+ //Serial.print("temperatura :");
+ //Serial.println(temperatura);
+
+
+ Serial.print("rpm :");
+ Serial.println(rpm);
+ Serial.print("- Velocidade:");
+Serial.print(velocidade);
+
+
  
- //enviarParaRealDash(rpm, velocidade, temperatura,nivelCombustivel, 
-//                    marcha,pressaoDualogic,sensores);
+// enviarParaRealDash(rpm, velocidade, temperatura,nivelCombustivel, 
+     //               marcha,pressaoDualogic,sensores);
 
 }
 

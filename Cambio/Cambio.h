@@ -109,23 +109,28 @@ class Cambio
 
 	}
 
-	long int obterModoAutomatico(long int sensores){
+	unsigned long int obterModoAutomatico(unsigned long int sensores){
 
 
 
 		int volt1 = map(analogRead(Pin1Joystick), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA); //Fio2			
 		int volt2  = map(analogRead(Pin2Joystick), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA); //Fio3			
 
+		
 
 		switch (volt1) {
-			case 7 ... 210:
+			case 70 ... 210:
 			switch (volt2) {
-				case 7 ... 210: 
+				case 70 ... 210: 
 					if (util.saidaTimer4()){ // se a ação demorar "TIMER4" segundos
 						
 						modoAutomatico =! modoAutomatico;
 						EEPROM.write(modoAutomatico,ENDERECO_MODOAUTOMATICO);
 						util.reIniciaTimer4();
+						//Serial.print("Sensores:");
+						//		Serial.print(volt1);
+						//		Serial.print("-");
+						//		Serial.println(volt2);
 					}
 					break;	
 				default: 
@@ -137,7 +142,7 @@ class Cambio
 		
 		}
 
-		if (modoAutomatico) // 28 = ultimo bit para sensor, portanto o bit 29 vai dizer ao realdash a indicção do modo automativo
+		if (true) // 28 = ultimo bit para sensor, portanto o bit 29 vai dizer ao realdash a indicção do modo automativo
 		    sensores |= (1UL << 29);
 
 

@@ -1,6 +1,7 @@
 #include "Pulso.h"
 #include "EEPROM.h"
 #include "Util.h"
+#include <stdlib.h>
 #define VALOR_MIN_TEMP_RADIADOR 20
 #define VALOR_MAX_TEMP_RADIADOR 120
 
@@ -15,6 +16,7 @@ private:
 	double KMPercorrida1Segundo;
 	uint8_t PinTemperaturaAguaRadiador;
 	int temperatura;
+	int countPulsoAnt;
 
    public:
 
@@ -33,20 +35,25 @@ private:
 		//KM = word(h,l);
 		util.iniciaTimer1(TIMER_1); // Iniciar timer1 para controle de 'delay'
 		util.iniciaTimer2(TIMER_2); // Iniciar timer1 para controle de 'delay'
-	
+		
 	};
 
        double obterRpm(){
 				
 		if (util.saidaTimer1()){
-			long countPulso = pulso->getPulsoRpm();
+			int countPulso = pulso->getPulsoRpm();
+			if (abs(countPulsoAnt-countPulso)!=1)			
+				countPulsoAnt = countPulso;
+
 			pulso->reiniciarRpm();
 			
-			rpm = countPulso*60; // Segudo ---> Minuto
+			rpm = countPulsoAnt*60; // Segudo ---> Minuto
 
-			
+			//Serial.print("Pulso RPM:");							
+			//Serial.println(countPulso);			
 		}
 
+				
 		return rpm;
 
 	}
@@ -56,15 +63,18 @@ private:
 		if (util.saidaTimer1()){
 			util.reIniciaTimer1();	
 			double diametroRoda = 60; // cm
-			long countPulso = pulso->getPulsoVelocidade();
+			//14 pulsos = uma volta completa
+			double pulsoPorVolta = 16;			
 
+			long countPulso = pulso->getPulsoVelocidade();
 			pulso->reiniciarVelocidade();
 			
 			double perimetro = diametroRoda * PI;// cm
 	
-			KMPercorrida1Segundo = (perimetro * countPulso/100/1000);
+
+			KMPercorrida1Segundo = ((perimetro * (countPulso / pulsoPorVolta))/100/1000);
 			KM += KMPercorrida1Segundo; 
-			
+
 			//byte h = highByte(KM);
 			//byte l = lowByte(KM);
 
@@ -73,8 +83,9 @@ private:
 
 
 
+		
 		}
-
+		
 		return KM;
 
 	}
@@ -98,8 +109,10 @@ private:
 			//0.48 -> 120 graus * 0.004887586 = 100
 
 			//float voltPorUnidade = 0.004887586;
-			temperatura  = map(analogRead(PinTemperaturaAguaRadiador), 781, 100, VALOR_MIN_TEMP_RADIADOR, VALOR_MAX_TEMP_RADIADOR);			
-			//Serial.println("temperatura");		
+			temperatura  = map(analogRead(PinTemperaturaAguaRadiador), 100,781 ,VALOR_MAX_TEMP_RADIADOR, VALOR_MIN_TEMP_RADIADOR);			
+			//Serial.println("temperatura");
+			//Serial.println(temperatura);				
+
 			util.reIniciaTimer2();
 		}
 
@@ -112,6 +125,7 @@ private:
 	double obterVelocidade(){
 
 		return KMPercorrida1Segundo*60*60;
+
 
 
 	}

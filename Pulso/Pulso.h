@@ -14,12 +14,12 @@ class Pulso : public Interrupt{
       PinRotacao = pinRotacao;
       PinVelocidade = pinVelocidade;
 
-      pinMode(pinRotacao, INPUT_PULLUP);
-      pinMode(pinVelocidade, INPUT_PULLUP);
+      pinMode(pinRotacao, INPUT);
+      pinMode(pinVelocidade, INPUT);
 
-      attach(pinRotacao, FALLING);
+      attach(pinRotacao, RISING);
 
-      attach(pinVelocidade, FALLING);
+      attach(pinVelocidade, RISING);
 
     }
 
@@ -43,10 +43,11 @@ class Pulso : public Interrupt{
 	
 	if (interruptNum==PinRotacao){
 		countPulsoRpm++;
-	}
-
-	if (interruptNum==PinVelocidade){
+		//Serial.print("RPM");
+	
+	}else if (interruptNum==PinVelocidade){
 		countPulsoVelocidade++;
+		//Serial.print("VELOCIDADE");
 	}
 
     }

@@ -6,7 +6,7 @@
 //Mega
 #define PIN_INI 22  
 //PIN 28 "NAO USAR POIS é apenas de indicação no .xml para o RealDash( AlgoAberto) "
-#define PIN_FIM 49
+#define PIN_FIM 50
 #define PIN_PORTAS PIN_INI + 6
 
 class Bordo{ 
@@ -62,7 +62,7 @@ private:
 				nivelAtual = map((sensorNivelCombustivel*voltPorUnidade),VOLT_TANQUE_VAZIO ,VOLT_TANQUE_CHEIO , 						            VALOR_MIN_NIVEL_COMBUSTIVEL,VALOR_MAX_NIVEL_COMBUSTIVEL);			
 			}else nivelAtual = 0;
 
-			if (nivelMemoria==0) nivelMemoria = nivelAtual;
+			if (nivelMemoria==0 && nivelAtual!=100) nivelMemoria = nivelAtual;
 
 
 
@@ -83,6 +83,7 @@ private:
 			util.reIniciaTimer3();	
 		}
 
+
 		return nivelMemoria;	
 
 
@@ -101,8 +102,8 @@ private:
 		  int bitposition = 0;
 		  bool algoAberto = false; //4 Portas, Porta-Mala ou Capoo (bits[0 - 5] do .xml ) 
 	          
-		  //2^0,2^1,2^2,2^3,2^4 ... ATÉ 2^30  (.XML)
-			//	22    â	  49	
+		  //2^0,2^1,2^2,2^3,2^4 ... ATÉ 2^50  (.XML)
+			//	22    â	 50	
 		  for (int i=PIN_INI; i<=PIN_FIM; i++) {
 		    
 			if (digitalRead(i) == LOW){

@@ -12,11 +12,11 @@
 
     <frame id="3201">
 
-      <value name="PortaDE" startbit="0" bitcount="1"></value>
-      <value name="PortaDD" startbit="1" bitcount="1"></value>
-      <value name="PortaTD" startbit="2" bitcount="1"></value>
-      <value name="PortaTE" startbit="3" bitcount="1"></value>
-      <value name="PortaMala" startbit="4" bitcount="1"></value>
+      <value name="PortaDE" startbit="0" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
+      <value name="PortaDD" startbit="1" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
+      <value name="PortaTD" startbit="2" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
+      <value name="PortaTE" startbit="3" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
+      <value name="PortaMala" startbit="4" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
       <value name="Capoo" startbit="5" bitcount="1"></value>      
       <value name="AlgoAberto" startbit="6" bitcount="1"></value>      
       <value name="Bateria" startbit="7" bitcount="1"></value>
@@ -29,7 +29,7 @@
       <value name="SetaDireita" startbit="14" bitcount="1"></value>
       <value name="SetaEsquerda" startbit="15" bitcount="1"></value>
       <value name="FarolAlto" startbit="16" bitcount="1"></value>
-      <value name="NeblicaTraseita" startbit="17" bitcount="1"></value>
+      <value name="NeblinaTraseita" startbit="17" bitcount="1"></value>
       <value name="NeblinaFrontal" startbit="18" bitcount="1"></value>
       <value name="Cinto" startbit="19" bitcount="1"></value>
       <value name="Cruise" startbit="20" bitcount="1"></value>
@@ -41,7 +41,7 @@
       <value name="Esguincho" startbit="26" bitcount="1"></value>
       <value name="NivelAguaRadiador" startbit="27" bitcount="1"></value>
       <value name="Eletroventilador" startbit="28" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
-
+      <value name="ManualAutomatico" startbit="29" bitcount="1"></value>
    </frame>	
      <frame id="3202">    
            <value targetId="200" offset="0" length="1"  conversion="V-1"></value>  <!-- Marcha Selecionada -->
