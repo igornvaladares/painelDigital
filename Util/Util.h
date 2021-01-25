@@ -21,12 +21,6 @@ public:
 	  
 	}
 
-	unsigned long getTempoEsperaTimer1() {
-
-	    return Delay1;
-	
-	}
-
 	void iniciaTimer1(unsigned long delay) {
 
 		Delay1 = delay;
@@ -114,6 +108,22 @@ public:
 		}else return false;
 	}      
    
+
+	double estabilizarEntrada(uint8_t pinAnalogico){
+	
+		double mediaAnaLogico=0;
+
+		for (int i=1;i<=20;i++){
+
+			mediaAnaLogico += analogRead(pinAnalogico);
+		}
+
+		mediaAnaLogico = mediaAnaLogico / 20;
+
+		return mediaAnaLogico;
+
+	
+    }
 };
  
  

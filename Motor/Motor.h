@@ -1,7 +1,5 @@
 #include "Pulso.h"
-#include "EEPROM.h"
 #include "Util.h"
-#include <stdlib.h>
 #define VALOR_MIN_TEMP_RADIADOR 20
 #define VALOR_MAX_TEMP_RADIADOR 120
 
@@ -13,9 +11,10 @@ private:
 	double rpm;
 	double velocidade;
 	double KM=0;
-	double KMPercorrida1Segundo;
+	double KMPercorridaMeioSegundo;
 	uint8_t PinTemperaturaAguaRadiador;
-	int temperatura;
+	double temperatura=0;
+	double ref=0;
 	int countPulsoAnt;
 
    public:
@@ -47,9 +46,9 @@ private:
 
 			pulso->reiniciarRpm();
 			
-			rpm = countPulsoAnt*60; // Segudo ---> Minuto
-
-			//Serial.print("Pulso RPM:");							
+			rpm = countPulsoAnt*120; // Segudo/ 2 ---> Minuto
+			//rpm++;
+			//Serial.println("Pulso RPM:");							
 			//Serial.println(countPulso);			
 		}
 
@@ -72,8 +71,8 @@ private:
 			double perimetro = diametroRoda * PI;// cm
 	
 
-			KMPercorrida1Segundo = ((perimetro * (countPulso / pulsoPorVolta))/100/1000);
-			KM += KMPercorrida1Segundo; 
+			KMPercorridaMeioSegundo = ((perimetro * (countPulso / pulsoPorVolta))/100/1000);
+			KM += KMPercorridaMeioSegundo; 
 
 			//byte h = highByte(KM);
 			//byte l = lowByte(KM);
@@ -94,23 +93,25 @@ private:
 	int obterTemperaturaAguaRadiador(){
 
 		if (util.saidaTimer2()){
-			//OBS: Meio do Tanque a partir de 0,74 Volts e ventoinha liga a partir de 0.59v	
-
-			 //2.82 > 26 graus (Refenrencia)			
-		         //1.9 -> 45 graus 		
-			 //0.94 -> 75 graus 
-
-			///2.5 -> 30
-			// 1.3 -> 60 graau
-			// 0.6 -> 100 graus
-			
-			//3.75 -> 20 graus * 0.004887586 = 781
-			//3.11 -> 24 graus =
-			//0.48 -> 120 graus * 0.004887586 = 100
+			//OBS: Meio do Tanque a partir de 0,74 Volts e ventoinha liga a partir de 0.60v	(95 graus)
 
 			//float voltPorUnidade = 0.004887586;
-			temperatura  = map(analogRead(PinTemperaturaAguaRadiador), 100,781 ,VALOR_MAX_TEMP_RADIADOR, VALOR_MIN_TEMP_RADIADOR);			
-			//Serial.println("temperatura");
+			
+			temperatura = util.estabilizarEntrada(PinTemperaturaAguaRadiador);
+			//Serial.println("pintemperatura");
+			//Serial.print(temperatura);
+			
+			//	440un -> 40 Graus
+			//	125un - 97 Graus
+			//	_________
+			// 	315 - 57 
+			//	 X  - 1	
+			// x=  5.52
+			// 1024 / 5.52 = 185
+
+			// Diferenca 65
+			temperatura = map(temperatura, 1023,0 ,0, 185)-60;			
+			//Serial.print("-");								
 			//Serial.println(temperatura);				
 
 			util.reIniciaTimer2();
@@ -124,7 +125,7 @@ private:
 
 	double obterVelocidade(){
 
-		return KMPercorrida1Segundo*60*60;
+		return KMPercorridaMeioSegundo*60*60*2;
 
 
 

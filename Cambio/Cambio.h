@@ -1,9 +1,6 @@
 #include "Arduino.h"
 #define VOLT_MIN_REFERENCIA 0
 #define VOLT_MAX_REFERENCIA 500
-
-#define VALOR_MIN_REFERENCIA_SENSOR_PRESSAO 0
-#define VALOR_MAX_REFERENCIA_SENSOR_PRESSAO 100
 class Cambio
 {
     private:
@@ -25,10 +22,10 @@ class Cambio
 					 case 0 ... 199: // DIREITA
 					 	marcha= 6; //  5 - Marcha
 					 break;
-					 case 200 ... 299:
+					 case 200 ... 269:
 					 	marcha= 1;  // NEUTRO
 					 break;
-					 case 300 ... 500: //  ESQUEDA
+					 case 270 ... 500: //  ESQUEDA
 					 	marcha= 0; // Ré
 					 break;
 				}
@@ -36,13 +33,13 @@ class Cambio
 			 case 200 ... 299: // NO MEIO
 				switch (voltEngate) {
 					 case 0 ... 199:// DIREITA
-					 	marcha = 2; // 3 - Marcha
+					 	marcha = 4; // 3 - Marcha
 					 break;
-					 case 200 ... 299:
+					 case 200 ... 269:
 					 	marcha = 1;  // NEUTRO
 					 break;
-					 case 300 ... 500:  //  ESQUEDA
-					 	marcha = 3; // 4 - Marcha
+					 case 270 ... 500:  //  ESQUEDA
+					 	marcha = 5; // 4 - Marcha
 					 break;
 				}
 			 break;
@@ -51,10 +48,10 @@ class Cambio
 					 case 0 ... 199:// DIREITA
 					 	marcha = 2; // 1 - Marcha
 					 break;
-					 case 200 ... 299:
+					 case 200 ... 269:
 					 	marcha = 1;  // NEUTRO
 					 break;
-					 case 300 ... 500:  //  ESQUEDA
+					 case 270 ... 500:  //  ESQUEDA
 					 	marcha = 3; // 2 - Marcha
 					break;
 					}
@@ -91,10 +88,14 @@ class Cambio
 
 		int voltSelecao; 
 		int voltEngate; 
-
-		voltSelecao = map(analogRead(PinSelecao), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
-		voltEngate  = map(analogRead(PinEngate), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
-
+		voltSelecao = map(util.estabilizarEntrada(PinSelecao), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
+		voltEngate  = map(util.estabilizarEntrada(PinEngate), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
+		//Serial.print("Marcha:");
+		//Serial.print(voltSelecao);
+		//Serial.print("-");
+		//Serial.print(voltEngate);
+		//Serial.print("-");
+		//Serial.println(calcularMarcha(voltSelecao,voltEngate));
 		return calcularMarcha(voltSelecao,voltEngate);
 
 	}
@@ -102,10 +103,24 @@ class Cambio
 
 	 int obterPressaoDualogic(){
 
+		int anaLogico =0;
+         	anaLogico = util.estabilizarEntrada(PinPressaoDualogic);	
+		//576un > 36bar
+		//481un > 46bar
+		//____________________
+		// 95  - 10
+		// x      1
+ 
+		// x = 9.5
+		// 1024	/ 9.5 = 108	
 
-         	return map(analogRead(PinPressaoDualogic), 0, 1023, VALOR_MIN_REFERENCIA_SENSOR_PRESSAO, VALOR_MAX_REFERENCIA_SENSOR_PRESSAO);			
-
-
+		//Serial.print("Pressao:");
+		//Serial.print(anaLogico);
+		
+		//Serial.print("-");
+		//Serial.println(map(anaLogico, 0, 1023, 0, 108)-14);
+		
+		return map(anaLogico, 0, 1023, 0, 108)-14;
 
 	}
 
@@ -113,8 +128,8 @@ class Cambio
 
 
 
-		int volt1 = map(analogRead(Pin1Joystick), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA); //Fio2			
-		int volt2  = map(analogRead(Pin2Joystick), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA); //Fio3			
+		int volt1 = map(util.estabilizarEntrada(Pin1Joystick), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA); //Fio2			
+		int volt2  = map(util.estabilizarEntrada(Pin2Joystick), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA); //Fio3			
 
 		
 
@@ -142,7 +157,7 @@ class Cambio
 		
 		}
 
-		if (true) // 28 = ultimo bit para sensor, portanto o bit 29 vai dizer ao realdash a indicção do modo automativo
+		if (modoAutomatico) // 28 = ultimo bit para sensor, portanto o bit 29 vai dizer ao realdash a indicção do modo automativo
 		    sensores |= (1UL << 29);
 
 

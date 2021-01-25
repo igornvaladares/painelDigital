@@ -18,30 +18,30 @@
       <value name="PortaTE" startbit="3" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
       <value name="PortaMala" startbit="4" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
       <value name="Capoo" startbit="5" bitcount="1"></value>      
-      <value name="AlgoAberto" startbit="6" bitcount="1"></value>      
-      <value name="Bateria" startbit="7" bitcount="1"></value>
-      <value name="Cambio" startbit="8" bitcount="1"></value>
-      <value name="OleoBaixo" startbit="9" bitcount="1"></value>
-      <value name="Injecao" startbit="10" bitcount="1"></value>
-      <value name="FreioEstacionamento" startbit="11" bitcount="1"></value>
-      <value name="Pastilha" startbit="12" bitcount="1"></value>
-      <value name="imobilizador" startbit="13" bitcount="1"></value>
-      <value name="SetaDireita" startbit="14" bitcount="1"></value>
-      <value name="SetaEsquerda" startbit="15" bitcount="1"></value>
-      <value name="FarolAlto" startbit="16" bitcount="1"></value>
-      <value name="NeblinaTraseita" startbit="17" bitcount="1"></value>
-      <value name="NeblinaFrontal" startbit="18" bitcount="1"></value>
-      <value name="Cinto" startbit="19" bitcount="1"></value>
-      <value name="Cruise" startbit="20" bitcount="1"></value>
-      <value name="LampadaQueimanda" startbit="21" bitcount="1"></value>
-      <value name="DirecaoEletrica" startbit="22" bitcount="1"></value>
-      <value name="Triangulo" startbit="23" bitcount="1"></value>
-      <value name="PartidaFrio" startbit="24" bitcount="1"></value>
-      <value name="FarolBaixo" startbit="25" bitcount="1"></value>
+      <value name="AlgoAberto" startbit="6" bitcount="1"></value><!--Pin 28 (NAO USAR) -->      
+      <value name="Bateria" startbit="7" bitcount="1"></value><!--Pin 29 (4) -->      
+      <value name="Cambio" startbit="8" bitcount="1"></value><!--Pin 30 (9)-->      
+      <value name="OleoBaixo" startbit="9" bitcount="1"></value><!--Pin 31 (7) -->      
+      <value name="Injecao" startbit="10" bitcount="1"></value><!--Pin 32  (8)-->      
+      <value name="FreioEstacionamento" startbit="11" bitcount="1"></value><!--Pin 33 (6) -->      
+      <value name="Pastilha" startbit="12" bitcount="1"></value><!--Pin 34 (26) -->      
+      <value name="imobilizador" startbit="13" bitcount="1"></value><!--Pin 35 (5) -->      
+      <value name="SetaDireita" startbit="14" bitcount="1"></value><!--Pin 36 (24) -->      
+      <value name="SetaEsquerda" startbit="15" bitcount="1"></value><!--Pin 37 (25) -->      
+      <value name="FarolAlto" startbit="16" bitcount="1"></value><!--Pin 38 (22) -->      
+      <value name="NeblinaTraseita" startbit="17" bitcount="1"></value><!--Pin 39 (13) -->      
+      <value name="NeblinaFrontal" startbit="18" bitcount="1"></value><!--Pin 40 (17)-->      
+      <value name="Cinto" startbit="19" bitcount="1"></value><!--Pin 41 (19) -->      
+      <value name="Cruise" startbit="20" bitcount="1"></value><!--Pin 42 (11) -->      
+      <value name="LampadaQueimanda" startbit="21" bitcount="1"></value><!--Pin 43 (23) -->      
+      <value name="DirecaoEletrica" startbit="22" bitcount="1"></value><!--Pin 44 (10) -->      
+      <value name="Triangulo" startbit="23" bitcount="1"></value><!--Pin 45 (18)-->      
+      <value name="PartidaFrio" startbit="24" bitcount="1"></value><!--NAO USAR -->      
+      <value name="FarolBaixo" startbit="25" bitcount="1"></value><!--Pin 47 (3)-->      
       <value name="Esguincho" startbit="26" bitcount="1"></value>
-      <value name="NivelAguaRadiador" startbit="27" bitcount="1"></value>
-      <value name="Eletroventilador" startbit="28" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
-      <value name="ManualAutomatico" startbit="29" bitcount="1"></value>
+      <value name="NivelAguaRadiador" startbit="27" bitcount="1"></value><!--Pin 49 -->      
+      <value name="Eletroventilador" startbit="28" bitcount="1"></value><!--Pin 50 - Necessário Diodo na porta do arduino -->
+      <value name="ManualAutomatico" startbit="29" bitcount="1"></value><!--Pin 51 (NAO USAR) -->      
    </frame>	
      <frame id="3202">    
            <value targetId="200" offset="0" length="1"  conversion="V-1"></value>  <!-- Marcha Selecionada -->
