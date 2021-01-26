@@ -42,10 +42,8 @@
       <value name="NivelAguaRadiador" startbit="27" bitcount="1"></value><!--Pin 49 -->      
       <value name="Eletroventilador" startbit="28" bitcount="1"></value><!--Pin 50 - Necessário Diodo na porta do arduino -->
       <value name="ManualAutomatico" startbit="29" bitcount="1"></value><!--Pin 51 (NAO USAR) -->      
-   </frame>	
-     <frame id="3202">    
-           <value targetId="200" offset="0" length="1"  conversion="V-1"></value>  <!-- Marcha Selecionada -->
-	   <value targetId="151" units="%" offset="2" length="2"></value> <!-- Pressão Dualogic -->
+      <value targetId="200" offset="4" length="1"  conversion="V-1"></value>  <!-- Marcha Selecionada -->
+      <value targetId="180" units="%" offset="6" length="2"></value> <!-- Pressão Dualogic -->
      </frame>
 
   </frames>
