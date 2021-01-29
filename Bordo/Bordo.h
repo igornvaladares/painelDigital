@@ -7,6 +7,7 @@
 #define PIN_INI 22  
 //PIN 28 "NAO USAR POIS é apenas de indicação no .xml para o RealDash( AlgoAberto) "
 #define PIN_FIM 50
+#define PIN_CAPO 27
 #define PIN_PORTAS PIN_INI + 6
 
 class Bordo{ 
@@ -106,13 +107,21 @@ private:
 			//	22    â	 50	
 		  for (int i=PIN_INI; i<=PIN_FIM; i++) {
 		    
-			if (digitalRead(i) == LOW){
-				digitalPins |= (1UL << bitposition);
+			if (i !=PIN_CAPO) { // CAPO tem a logica inversa. Low é fechado, hight aberto
+			
+				if (digitalRead(i) == LOW){
+					digitalPins |= (1UL << bitposition);
 
-				if (i<PIN_PORTAS){
-				   algoAberto = true; 
+					if (i<PIN_PORTAS){
+					   algoAberto = true; 
+					}
+
 				}
-			}
+			}else
+				if (digitalRead(i)){
+					digitalPins |= (1UL << bitposition);
+					algoAberto = true; 
+				}
 			bitposition++;
 		  
 		

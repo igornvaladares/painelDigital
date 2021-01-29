@@ -1,5 +1,4 @@
 #include "Arduino.h"
-#include <SoftwareSerial.h>
 
 class RealDash
 {

@@ -32,10 +32,10 @@ class Cambio
 			 break;
 			 case 200 ... 299: // NO MEIO
 				switch (voltEngate) {
-					 case 0 ... 199:// DIREITA
+					 case 0 ... 170:// DIREITA
 					 	marcha = 4; // 3 - Marcha
 					 break;
-					 case 200 ... 269:
+					 case 171 ... 269:
 					 	marcha = 1;  // NEUTRO
 					 break;
 					 case 270 ... 500:  //  ESQUEDA
@@ -120,7 +120,7 @@ class Cambio
 		//Serial.print("-");
 		//Serial.println(map(anaLogico, 0, 1023, 0, 108)-14);
 		
-		return map(anaLogico, 0, 1023, 0, 108)-14;
+		return map(anaLogico, 0, 1023, 0, 108)-7;
 
 	}
 
