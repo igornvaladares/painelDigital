@@ -1,8 +1,4 @@
 #include "Arduino.h"
-#define VALOR_MIN_NIVEL_COMBUSTIVEL 0
-#define VALOR_MAX_NIVEL_COMBUSTIVEL 100
-#define VOLT_TANQUE_VAZIO 5.60
-#define VOLT_TANQUE_CHEIO 0.72
 //Mega
 #define PIN_INI 22  
 //PIN 28 "NAO USAR POIS é apenas de indicação no .xml para o RealDash( AlgoAberto) "
@@ -15,8 +11,6 @@ class Bordo{
 private:
 	Util util;
 	uint8_t PinNivelCombustivel;
-	
-	const uint8_t desvioCombustivel = 0;
 	
 	int nivelMemoria = 0; //Inicial
    public:
@@ -41,9 +35,21 @@ private:
 
 		/*
 		COMBUSTIVEL (VERIFICAR)
-		Cheio: 33 ± 4 ohms | 0.723 Volts
-		Vazio: 313 ± 4 ohms | 5.6 volts
-		233 -> 5.1 Volts
+		<Tensao     	 >Tensao
+		Vazio    Meio    Cheio		
+		 285-315 155-165 38-42
+		 308-318 162-168 36-40 
+
+		5.5 volts > vazio (Calculado)
+
+		6.5 volts > 1/4 de Tanque (ligado)
+		7.3 volts > 1/2 de Tanque (ligado)
+
+		8.1 volts > 3/4 de Tanque (calculado)
+		9.0 volts > 4/4(cheio) de Tanque (calculado)
+
+
+
 		*/
 
 		if (util.saidaTimer3()){
@@ -51,29 +57,36 @@ private:
 			float R1 = 30000;
 			float R2 = 7500;
 			float voltPorUnidade = 0.004887586;
-			int nivelAtual=0;			
+			float nivelAtual=0;			
 			float sensorNivelCombustivel=0; 
 		
 			float sensorNivelCombustivel_Aux =0;
 			//(0-5)			
-			sensorNivelCombustivel_Aux = analogRead(PinNivelCombustivel);
+			sensorNivelCombustivel_Aux = util.estabilizarEntrada(PinNivelCombustivel);
+
+			
 			//(0-25)
-			if (sensorNivelCombustivel_Aux>0){
+			if (sensorNivelCombustivel_Aux>0 && sensorNivelCombustivel_Aux>202){
 				sensorNivelCombustivel =  sensorNivelCombustivel_Aux / (R2/(R1+R2));
-				nivelAtual = map((sensorNivelCombustivel*voltPorUnidade),VOLT_TANQUE_VAZIO ,VOLT_TANQUE_CHEIO , 						            VALOR_MIN_NIVEL_COMBUSTIVEL,VALOR_MAX_NIVEL_COMBUSTIVEL);			
+			//Serial.print("sensor:");
+			//Serial.print(sensorNivelCombustivel_Aux);
+	nivelAtual=map((sensorNivelCombustivel*voltPorUnidade),5.5,9,0,100);			
+			//Serial.print("volt:");
+			//Serial.println(sensorNivelCombustivel*voltPorUnidade);
+
 			}else nivelAtual = 0;
 
 			if (nivelMemoria==0 && nivelAtual!=100) nivelMemoria = nivelAtual;
 
 
 
-			if (nivelAtual < (nivelMemoria - desvioCombustivel)){
+			if (nivelAtual < nivelMemoria){
 				//Oscilando para baixo
 				nivelMemoria--;
 				
 			}else{
 
-				if (nivelAtual > (nivelMemoria + desvioCombustivel)){
+				if (nivelAtual > nivelMemoria){
 					//Oscilando para cima
 					nivelMemoria++;
 
@@ -81,6 +94,8 @@ private:
 			}
 			//	Serial.println(PIN_PORTAS);
 
+			//if (nivelMemoria<0)  nivelMemoria=0;
+			//if (nivelMemoria>100) nivelMemoria=100;			
 			util.reIniciaTimer3();	
 		}
 
