@@ -46,8 +46,8 @@ private:
 
 			pulso->reiniciarRpm();
 			//1s    1/2s   1/4s   1/8s
-			//60 -> 120 -> 180 -> 240
-			rpm = countPulsoAnt*240; // Segudo
+			//60 -> 120 -> 240 -> 480
+			rpm = countPulsoAnt*480; // Segudo
 			//rpm++;
 			//Serial.println("Pulso RPM:");							
 			//Serial.println(countPulso);			
