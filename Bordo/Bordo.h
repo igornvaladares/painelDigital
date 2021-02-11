@@ -10,15 +10,18 @@ class Bordo{
 
 private:
 	Util util;
-	uint8_t PinNivelCombustivel;
-	
-	int nivelMemoria = 0; //Inicial
+	uint8_t PinNivelCombustivel1;
+	uint8_t PinNivelCombustivel2;	
+	int nivelEstavel = 0; //Inicial
    public:
 
-        Bordo(uint8_t pinNivelCombustivel){
+        Bordo(uint8_t pinNivelCombustivel1, uint8_t pinNivelCombustivel2){
 		
-		pinMode(pinNivelCombustivel, INPUT);
-		PinNivelCombustivel = pinNivelCombustivel;
+		pinMode(pinNivelCombustivel1, INPUT);
+		pinMode(pinNivelCombustivel2, INPUT);
+
+		PinNivelCombustivel1 = pinNivelCombustivel1;
+		PinNivelCombustivel2 = pinNivelCombustivel2;
 
 		obterNivelCombustivel();
 		util.iniciaTimer3(TIMER_3); // Iniciar timer3 para controle de 'delay'    
@@ -34,6 +37,11 @@ private:
 	int obterNivelCombustivel(){
 
 		/*
+
+		Vazio - 	          6.66(ligado) e 5.9(pos chave)
+		inicio de reserva 280ohm  6.25(ligado) e 5.43(pos chave)
+
+
 		COMBUSTIVEL (VERIFICAR)
 		<Tensao     	 >Tensao
 		Vazio    Meio    Cheio		
@@ -54,53 +62,65 @@ private:
 
 		if (util.saidaTimer3()){
 
-			float R1 = 30000;
-			float R2 = 7500;
+			//float R1 = 30000;
+			//float R2 = 7500;
 			float voltPorUnidade = 0.004887586;
-			float nivelAtual=0;			
+			int nivelAtual=0;			
 			float sensorNivelCombustivel=0; 
 		
 			float sensorNivelCombustivel_Aux =0;
+			float sensorNivelCombustivel_Aux1 =0;
+			float sensorNivelCombustivel_Aux2 =0;
 			//(0-5)			
-			sensorNivelCombustivel_Aux = util.estabilizarEntrada(PinNivelCombustivel);
+			sensorNivelCombustivel_Aux1 = util.estabilizarEntrada(PinNivelCombustivel1);
+			sensorNivelCombustivel_Aux2 = util.estabilizarEntrada(PinNivelCombustivel2);
 
-			
+			sensorNivelCombustivel_Aux = abs(sensorNivelCombustivel_Aux2 - sensorNivelCombustivel_Aux1);
+
+			//Serial.print("-");
+			//Serial.println(sensorNivelCombustivel_Aux2);
+
 			//(0-25)
-			if (sensorNivelCombustivel_Aux>0 && sensorNivelCombustivel_Aux>202){
-				sensorNivelCombustivel =  sensorNivelCombustivel_Aux / (R2/(R1+R2));
-			//Serial.print("sensor:");
-			//Serial.print(sensorNivelCombustivel_Aux);
-	nivelAtual=map((sensorNivelCombustivel*voltPorUnidade),5.5,9,0,100);			
-			//Serial.print("volt:");
-			//Serial.println(sensorNivelCombustivel*voltPorUnidade);
+			if (sensorNivelCombustivel_Aux>0){
+
+				//sensorNivelCombustivel =  sensorNivelCombustivel_Aux * 5; // = sensorNivelCombustivel_Aux / (R2/(R1+R2));
+
+				nivelAtual=map(sensorNivelCombustivel_Aux,272,164,0,100);			
+				//Serial.print("volt:");
+				//Serial.println(sensorNivelCombustivel*voltPorUnidade);
+
 
 			}else nivelAtual = 0;
 
-			if (nivelMemoria==0 && nivelAtual!=100) nivelMemoria = nivelAtual;
+
+			//Serial.println("nivelAtual:");
+			//Serial.print(nivelAtual);
+
+			if (nivelAtual==0) nivelEstavel = nivelAtual;
 
 
 
-			if (nivelAtual < nivelMemoria){
+			if (nivelAtual < nivelEstavel){
 				//Oscilando para baixo
-				nivelMemoria--;
+				nivelEstavel--;
 				
 			}else{
 
-				if (nivelAtual > nivelMemoria){
+				if (nivelAtual > nivelEstavel){
 					//Oscilando para cima
-					nivelMemoria++;
+					nivelEstavel++;
 
 				}
 			}
 			//	Serial.println(PIN_PORTAS);
 
-			//if (nivelMemoria<0)  nivelMemoria=0;
-			//if (nivelMemoria>100) nivelMemoria=100;			
+			///if (nivelMemoria<0)  nivelMemoria=0;
+
 			util.reIniciaTimer3();	
 		}
 
 
-		return nivelMemoria;	
+		return nivelEstavel;	
 
 
 	}

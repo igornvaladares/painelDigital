@@ -13,7 +13,7 @@ private:
 	double KM=0;
 	double KMPercorridaMeioSegundo;
 	uint8_t PinTemperaturaAguaRadiador;
-	double temperatura=0;
+	int nivelMemoriaTemperatura=0;
 	double ref=0;
 	int countPulsoAnt;
 
@@ -47,7 +47,7 @@ private:
 			pulso->reiniciarRpm();
 			//1s    1/2s   1/4s   1/8s
 			//60 -> 120 -> 240 -> 480
-			rpm = countPulsoAnt*480; // Segudo
+			rpm = countPulsoAnt*120; // Segudo
 			//rpm++;
 			//Serial.println("Pulso RPM:");							
 			//Serial.println(countPulso);			
@@ -97,8 +97,10 @@ private:
 			//OBS: Meio do Tanque a partir de 0,74 Volts e ventoinha liga a partir de 0.60v	(95 graus)
 
 			//float voltPorUnidade = 0.004887586;
-			
-			temperatura = util.estabilizarEntrada(PinTemperaturaAguaRadiador);
+			int nivelAtual=0;
+
+
+			nivelAtual = util.estabilizarEntrada(PinTemperaturaAguaRadiador);
 			//Serial.println("pintemperatura");
 			//Serial.print(temperatura);
 			
@@ -110,15 +112,30 @@ private:
 			// x=  5.52
 			// 1024 / 5.52 = 185
 
+			
 			// Diferenca 65
-			temperatura = map(temperatura, 1023,0 ,0, 185)-60;			
+			nivelAtual = map(nivelAtual, 1023,0 ,0, 185)-75;
+
+			if (nivelMemoriaTemperatura==0) nivelMemoriaTemperatura = nivelAtual;
+
+			if (nivelAtual < nivelMemoriaTemperatura){
+				//Oscilando para baixo
+				nivelMemoriaTemperatura--;
+			}else{
+				if (nivelAtual > nivelMemoriaTemperatura){
+				//Oscilando para cima
+					nivelMemoriaTemperatura++;
+				}
+			}
+
+			
 			//Serial.print("-");								
 			//Serial.println(temperatura);				
 
 			util.reIniciaTimer2();
 		}
 
-		return temperatura;	
+		return nivelMemoriaTemperatura;	
 	}
 
 
