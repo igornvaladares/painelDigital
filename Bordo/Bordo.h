@@ -40,7 +40,8 @@ private:
 
 		Vazio - 	          6.66(ligado) e 5.9(pos chave)
 		inicio de reserva 280ohm  6.25(ligado) e 5.43(pos chave)
-
+		3/4 	- 	          3.00(ligado) e 2.8(pos chave)
+		4/4 	- 	          2.1(Calculado)
 
 		COMBUSTIVEL (VERIFICAR)
 		<Tensao     	 >Tensao
@@ -85,18 +86,19 @@ private:
 
 				//sensorNivelCombustivel =  sensorNivelCombustivel_Aux * 5; // = sensorNivelCombustivel_Aux / (R2/(R1+R2));
 
-				nivelAtual=map(sensorNivelCombustivel_Aux,272,164,0,100);			
+				// 6.66 % 5 % 0.004887586 = 272	
+				// 2.1 % 5 % 0.004887586 = 86	
+				// 1.5 % 5 % 0.004887586 = 61	
+
+				nivelAtual=map(sensorNivelCombustivel_Aux,280,61,0,100);			
 				//Serial.print("volt:");
 				//Serial.println(sensorNivelCombustivel*voltPorUnidade);
 
 
-			}else nivelAtual = 0;
+			}//else nivelAtual = 0;
 
 
-			//Serial.println("nivelAtual:");
-			//Serial.print(nivelAtual);
-
-			if (nivelAtual==0) nivelEstavel = nivelAtual;
+			if (nivelEstavel==0) nivelEstavel = nivelAtual;
 
 
 

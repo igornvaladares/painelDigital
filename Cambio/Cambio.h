@@ -23,7 +23,7 @@ class Cambio
 					 	marcha= 6; //  5 - Marcha
 					 break;
 					 case 200 ... 269:
-					 	marcha= 1;  // NEUTRO
+					 	//marcha= 1;  // NEUTRO
 					 break;
 					 case 270 ... 500: //  ESQUEDA
 					 	marcha= 0; // Ré
@@ -49,7 +49,7 @@ class Cambio
 					 	marcha = 2; // 1 - Marcha
 					 break;
 					 case 200 ... 269:
-					 	marcha = 1;  // NEUTRO
+					 	//marcha = 1;  // NEUTRO
 					 break;
 					 case 270 ... 500:  //  ESQUEDA
 					 	marcha = 3; // 2 - Marcha

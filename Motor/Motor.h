@@ -57,6 +57,7 @@ private:
 		return rpm;
 
 	}
+ 
 
 	double obterOdometro(){
 
@@ -64,7 +65,7 @@ private:
 			util.reIniciaTimer1();	
 			double diametroRoda = 60; // cm
 			//14 pulsos = uma volta completa
-			double pulsoPorVolta = 16;			
+			double pulsoPorVolta = 10;			
 
 			long countPulso = pulso->getPulsoVelocidade();
 			pulso->reiniciarVelocidade();
@@ -116,11 +117,9 @@ private:
 			// Diferenca 65
 			nivelAtual = map(nivelAtual, 1023,0 ,0, 185)-75;
 
-			if (nivelMemoriaTemperatura==0) nivelMemoriaTemperatura = nivelAtual;
-
 			if (nivelAtual < nivelMemoriaTemperatura){
 				//Oscilando para baixo
-				nivelMemoriaTemperatura--;
+				nivelMemoriaTemperatura = nivelAtual;
 			}else{
 				if (nivelAtual > nivelMemoriaTemperatura){
 				//Oscilando para cima
