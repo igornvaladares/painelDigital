@@ -1,11 +1,12 @@
 #include "Arduino.h"
 //Mega
-#define PIN_INI 22  
+//#define PIN_INI 22
+#define PIN_INI 27
 //PIN 28 "NAO USAR POIS é apenas de indicação no .xml para o RealDash( AlgoAberto) "
 #define PIN_FIM 50
 #define PIN_CAPO 27
-#define PIN_PORTAS PIN_INI + 6
-
+//#define PIN_PORTAS PIN_INI + 6
+#define BIT_ALGOABERTO 6
 class Bordo{ 
 
 private:
@@ -13,6 +14,19 @@ private:
 	uint8_t PinNivelCombustivel1;
 	uint8_t PinNivelCombustivel2;	
 	int nivelEstavel = 0; //Inicial
+	float voltPorUnidade = 0.004887586;
+
+	bool isPortaAberta(uint8_t analogPin){
+		// se maior que 0.5V
+		//Serial.println(util.estabilizarEntrada(analogPin) * voltPorUnidade);
+		if ((util.estabilizarEntrada(analogPin) * voltPorUnidade)>0.6){
+
+			return false;
+
+		}
+		return true;
+
+	}
    public:
 
         Bordo(uint8_t pinNivelCombustivel1, uint8_t pinNivelCombustivel2){
@@ -63,28 +77,22 @@ private:
 
 		if (util.saidaTimer3()){
 
-			//float R1 = 30000;
-			//float R2 = 7500;
-			float voltPorUnidade = 0.004887586;
+
 			int nivelAtual=0;			
 			float sensorNivelCombustivel=0; 
 		
 			float sensorNivelCombustivel_Aux =0;
 			float sensorNivelCombustivel_Aux1 =0;
 			float sensorNivelCombustivel_Aux2 =0;
-			//(0-5)			
+
 			sensorNivelCombustivel_Aux1 = util.estabilizarEntrada(PinNivelCombustivel1);
 			sensorNivelCombustivel_Aux2 = util.estabilizarEntrada(PinNivelCombustivel2);
 
 			sensorNivelCombustivel_Aux = abs(sensorNivelCombustivel_Aux2 - sensorNivelCombustivel_Aux1);
 
-			//Serial.print("-");
-			//Serial.println(sensorNivelCombustivel_Aux2);
 
 			//(0-25)
 			if (sensorNivelCombustivel_Aux>0){
-
-				//sensorNivelCombustivel =  sensorNivelCombustivel_Aux * 5; // = sensorNivelCombustivel_Aux / (R2/(R1+R2));
 
 				// 6.66 % 5 % 0.004887586 = 272	
 				// 2.1 % 5 % 0.004887586 = 86	
@@ -114,9 +122,6 @@ private:
 
 				}
 			}
-			//	Serial.println(PIN_PORTAS);
-
-			///if (nivelMemoria<0)  nivelMemoria=0;
 
 			util.reIniciaTimer3();	
 		}
@@ -136,22 +141,36 @@ private:
 	unsigned long int obterSensoresDigitais(){
 
 		  unsigned long long int digitalPins = 0;
-
+		  int pin_analogico_ini = 8;//A8
+		  int pin_analogico_fim = 12;//A12
+		  int pin_capoo = 27;
 		  int bitposition = 0;
-		  bool algoAberto = false; //4 Portas, Porta-Mala ou Capoo (bits[0 - 5] do .xml ) 
-	          
+
+	          bool algoAberto = false; //4 Portas, Porta-Mala ou Capoo (bits[0 - 5] do .xml ) (4 Portas + Porta Malas)Portas Analogicas
+
+		  for (int i=pin_analogico_ini; i<=pin_analogico_fim; i++) {  
+
+			if (isPortaAberta(i)){
+
+				digitalPins |= (1UL << bitposition);
+				algoAberto = true; 
+
+			}
+			bitposition++;
+
+   	 	  }
+
+
 		  //2^0,2^1,2^2,2^3,2^4 ... ATÉ 2^50  (.XML)
 			//	22    â	 50	
-		  for (int i=PIN_INI; i<=PIN_FIM; i++) {
+
+		for (int i=PIN_INI; i<=PIN_FIM; i++) {
+
 		    
-			if (i !=PIN_CAPO) { // CAPO tem a logica inversa. Low é fechado, hight aberto
-			
+			if (i !=pin_capoo) { // CAPO tem a logica inversa. Low é fechado, hight aberto
+				// Lendo sinais do painel
 				if (digitalRead(i) == LOW){
 					digitalPins |= (1UL << bitposition);
-
-					if (i<PIN_PORTAS){
-					   algoAberto = true; 
-					}
 
 				}
 			}else
@@ -165,8 +184,8 @@ private:
 
 		  }
 		  //2^6 
-		  if (algoAberto) digitalPins |= (1 << (PIN_PORTAS - PIN_INI));
-
+		  //if (algoAberto) digitalPins |= (1 << (PIN_PORTAS - PIN_INI));
+		  if (algoAberto) digitalPins |= (1 << (BIT_ALGOABERTO));
 		  
 		  return digitalPins;
 

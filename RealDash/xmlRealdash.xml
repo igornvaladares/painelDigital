@@ -12,12 +12,12 @@
 
     <frame id="3201">
 
-      <value name="PortaDE" startbit="0" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
-      <value name="PortaDD" startbit="1" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
-      <value name="PortaTD" startbit="2" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
-      <value name="PortaTE" startbit="3" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
-      <value name="PortaMala" startbit="4" bitcount="1"></value><!--Necessário Diodo na porta do arduino -->
-      <value name="Capoo" startbit="5" bitcount="1"></value>      
+      <value name="PortaDE" startbit="0" bitcount="1"></value><!--Pin 22 -->
+      <value name="PortaDD" startbit="1" bitcount="1"></value><!--Pin 23 Necessário Diodo na porta do arduino -->
+      <value name="PortaTD" startbit="2" bitcount="1"></value><!--Pin 24 -->
+      <value name="PortaTE" startbit="3" bitcount="1"></value><!--Pin 25 -->
+      <value name="PortaMala" startbit="4" bitcount="1"></value><!--Pin 26 -->
+      <value name="Capoo" startbit="5" bitcount="1"></value><!--Pin 27 -->            
       <value name="AlgoAberto" startbit="6" bitcount="1"></value><!--Pin 28 (NAO USAR) -->      
       <value name="Bateria" startbit="7" bitcount="1"></value><!--Pin 29 (4) -->      
       <value name="Cambio" startbit="8" bitcount="1"></value><!--Pin 30 (9)-->      
