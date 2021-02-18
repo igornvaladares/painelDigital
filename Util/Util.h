@@ -15,6 +15,10 @@ private:
    unsigned long Tempo4 = 0;
    unsigned long Delay4 = 0;
 
+   long Tempo5 = 0;
+   unsigned long Delay5 = 0;
+   long tempoAnterior =0;
+
 public:
 	Util()
 	{
@@ -108,6 +112,24 @@ public:
 		}else return false;
 	}      
    
+	void iniciaTimer5(unsigned long delay) {
+
+		Delay5 = delay;
+
+	}
+
+	void reIniciaTimer5() {
+
+	    Tempo5 = millis();   
+
+	}
+
+	bool saidaTimer5() {
+	    if (((millis() - Delay5) > Tempo5)&&(millis()>Delay5)) { 
+			return true;
+
+		}else return false;
+	}   
 
 	double estabilizarEntrada(uint8_t pinAnalogico){
 	
@@ -123,7 +145,25 @@ public:
 		return mediaAnaLogico;
 
 	
-    }
+   	 }
+
+
+	 void bloquear(unsigned long tempoEspera){
+	 
+	   long tempoAtual = millis();
+	 
+	   while((tempoAtual-tempoAnterior)<=tempoEspera){
+	 
+		tempoAtual = millis();
+	  
+	    }
+	    
+	   tempoAnterior = millis();
+
+	 
+ 	}
+
+
 };
  
  

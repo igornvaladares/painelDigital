@@ -47,7 +47,7 @@ private:
 			pulso->reiniciarRpm();
 			//1s    1/2s   1/4s   1/8s
 			//60 -> 120 -> 240 -> 480
-			rpm = countPulsoAnt*120; // Segudo
+			rpm = countPulsoAnt*240; // Segudo
 			//rpm++;
 			//Serial.println("Pulso RPM:");							
 			//Serial.println(countPulso);			
@@ -58,14 +58,13 @@ private:
 
 	}
  
-
 	double obterOdometro(){
 
 		if (util.saidaTimer1()){
 			util.reIniciaTimer1();	
 			double diametroRoda = 60; // cm
 			//14 pulsos = uma volta completa
-			double pulsoPorVolta = 10;			
+			double pulsoPorVolta = 16;			
 
 			long countPulso = pulso->getPulsoVelocidade();
 			pulso->reiniciarVelocidade();
