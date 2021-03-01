@@ -30,10 +30,10 @@ public:
 
 			if (rpm ==0) {
 			          if (rpmAnt==0) {
-					 digitalWrite(PinSaidaDesligarAndroid, HIGH);
-					// Serial.println("DESLIGAR");		
-					 util.bloquear(tempo_power);
-						
+					digitalWrite(PinSaidaDesligarAndroid, HIGH);
+				        util.bloquear(tempo_power);
+ 					digitalWrite(PinSaidaDesligarAndroid, LOW);
+											
 				}
 			}
 			rpmAnt = rpm;

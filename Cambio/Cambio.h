@@ -10,27 +10,26 @@ class Cambio
 	uint8_t PinPressaoDualogic;
 	uint8_t Pin1Joystick;
 	uint8_t Pin2Joystick;
-
+	signed char marcha= 1; // Neutro
 	bool modoAutomatico;
 
 	signed char calcularMarcha(int voltSelecao, int voltEngate){
-              
-		signed char marcha= 1; // Neutro
-		switch (voltSelecao) {
-			 case 0 ... 199: // EM CIMA
+              if ((voltSelecao>0) && (voltEngate>0)){
+			switch (voltSelecao) {
+			  case 0 ... 199: // EM CIMA
 				switch (voltEngate) {
 					 case 0 ... 199: // DIREITA
 					 	marcha= 6; //  5 - Marcha
 					 break;
 					 case 200 ... 269:
-					 	//marcha= 1;  // NEUTRO
+					 	marcha= 1;  // NEUTRO
 					 break;
 					 case 270 ... 500: //  ESQUEDA
 					 	marcha= 0; // Ré
 					 break;
 				}
 			 break;
-			 case 200 ... 299: // NO MEIO
+			 case 200 ... 269: // NO MEIO
 				switch (voltEngate) {
 					 case 0 ... 170:// DIREITA
 					 	marcha = 4; // 3 - Marcha
@@ -43,21 +42,22 @@ class Cambio
 					 break;
 				}
 			 break;
-			 case 300 ... 500: //EM BAIXO
+			 case 270 ... 500: //EM BAIXO
 				switch (voltEngate) {
 					 case 0 ... 199:// DIREITA
 					 	marcha = 2; // 1 - Marcha
 					 break;
 					 case 200 ... 269:
-					 	//marcha = 1;  // NEUTRO
+					 	marcha = 1;  // NEUTRO
 					 break;
 					 case 270 ... 500:  //  ESQUEDA
 					 	marcha = 3; // 2 - Marcha
 					break;
 					}
 			 break;
-		}
+			}	
 		
+		}		
 		return marcha;
 	}
 
@@ -86,17 +86,15 @@ class Cambio
 	 signed char obterMarchaEngatada(){
 
 
-		int voltSelecao; 
-		int voltEngate; 
-		voltSelecao = map(util.estabilizarEntrada(PinSelecao), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
-		voltEngate  = map(util.estabilizarEntrada(PinEngate), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
-		//Serial.print("Marcha:");
-		//Serial.print(voltSelecao);
-		//Serial.print("-");
-		//Serial.print(voltEngate);
-		//Serial.print("-");
-		//Serial.println(calcularMarcha(voltSelecao,voltEngate));
-		return calcularMarcha(voltSelecao,voltEngate);
+		if (util.saidaTimer4()){ 
+			int voltSelecao; 
+			int voltEngate; 
+			voltSelecao = map(util.estabilizarEntrada(PinSelecao), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
+			voltEngate  = map(util.estabilizarEntrada(PinEngate), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
+			util.reIniciaTimer4();
+			marcha = calcularMarcha(voltSelecao,voltEngate);
+		}
+		return marcha;
 
 	}
 

@@ -17,7 +17,6 @@ private:
 
    long Tempo5 = 0;
    unsigned long Delay5 = 0;
-   long tempoAnterior =0;
 
 public:
 	Util()
@@ -151,7 +150,7 @@ public:
 	 void bloquear(unsigned long tempoEspera){
 	 
 	   long tempoAtual = millis();
-	 
+	   long tempoAnterior = millis();
 	   while((tempoAtual-tempoAnterior)<=tempoEspera){
 	 
 		tempoAtual = millis();

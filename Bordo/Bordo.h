@@ -19,7 +19,7 @@ private:
 	bool isPortaAberta(uint8_t analogPin){
 		// se maior que 0.5V
 		//Serial.println(util.estabilizarEntrada(analogPin) * voltPorUnidade);
-		if ((util.estabilizarEntrada(analogPin) * voltPorUnidade)>0.6){
+		if ((util.estabilizarEntrada(analogPin) * voltPorUnidade)>0.5){
 
 			return false;
 
