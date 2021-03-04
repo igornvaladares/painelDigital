@@ -8,11 +8,13 @@ class Motor{
 private:
 	Pulso * pulso; 
 	Util util;
-	double rpmEstavel;
 	double wKMporH ;
 	uint8_t PinTemperaturaAguaRadiador;
 	int nivelMemoriaTemperatura=0;
-	unsigned int countPulsoAnt;
+	float contPulsoAnt;
+	unsigned char contPulso;
+	float contPulsoEstavel;
+
 
    public:
 
@@ -34,26 +36,24 @@ private:
 		
 	};
 
-       double obterRpm(){
+       int obterRpm(){
 		unsigned int rpm;		
 		if (util.saidaTimer1()){
-			unsigned int countPulso = pulso->getPulsoRpm();
-			if (abs(countPulsoAnt-countPulso)!=1)			
-				countPulsoAnt = countPulso;
+			contPulso = pulso->getPulsoRpm();
+			if (abs(contPulsoAnt-contPulso)!=1)			
+				contPulsoAnt = contPulso;
 
 			pulso->reiniciarRpm();
-			rpm = countPulsoAnt*120; // Segudo
-		
 			//Serial.println("Pulso RPM:");							
 			//Serial.println(countPulso);			
 		}
 
-		if (rpm > rpmEstavel+15)
-			rpmEstavel=rpmEstavel+30;
-		else if (rpm < rpmEstavel-15)
-			rpmEstavel=rpmEstavel-30;
+		if (contPulsoAnt > contPulsoEstavel)
+			contPulsoEstavel+=0.25;
+		else if (contPulsoAnt < contPulsoEstavel)
+			contPulsoEstavel-=0.25 ;
 	
-		return rpmEstavel;
+		return (int)contPulsoEstavel*120;
 
 	}
  
@@ -66,10 +66,10 @@ private:
 
 			double diametroRoda = 65.73/100; 
 			double fatorMsParaKmh = 3.6;
-			int pulsoPorVolta=30; 
+			int pulsoPorVolta=32; 
 			int rpmV;
 			double hz; 
-			rpmV = countPulso*120/pulsoPorVolta;
+			rpmV = countPulso*60/pulsoPorVolta;
 			hz = rpmV /60;
 			wKMporH = PI*hz*diametroRoda*fatorMsParaKmh; 
 			
