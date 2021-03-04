@@ -14,8 +14,8 @@ class Cambio
 	bool modoAutomatico;
 
 	signed char calcularMarcha(int voltSelecao, int voltEngate){
-              if ((voltSelecao>0) && (voltEngate>0)){
-			switch (voltSelecao) {
+            
+		switch (voltSelecao) {
 			  case 0 ... 199: // EM CIMA
 				switch (voltEngate) {
 					 case 0 ... 199: // DIREITA
@@ -52,14 +52,14 @@ class Cambio
 					 break;
 					 case 270 ... 500:  //  ESQUEDA
 					 	marcha = 3; // 2 - Marcha
-					break;
+					 break;
 					}
 			 break;
-			}	
+	}	
 		
-		}		
-		return marcha;
-	}
+	return marcha;
+
+    }
 
     public:
 
@@ -87,12 +87,25 @@ class Cambio
 
 
 		if (util.saidaTimer4()){ 
-			int voltSelecao; 
-			int voltEngate; 
-			voltSelecao = map(util.estabilizarEntrada(PinSelecao), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
-			voltEngate  = map(util.estabilizarEntrada(PinEngate), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
+			int voltSelecao, entradaSelecao; 
+			int voltEngate, entradaEngate; 
+			entradaSelecao = util.estabilizarEntrada(PinSelecao);
+			entradaEngate = util.estabilizarEntrada(PinEngate);
+			//tradaSelecao = 100;
+			//entradaEngate = 100;
+			if (entradaEngate>0 && entradaSelecao>0){
+				voltSelecao = map(entradaSelecao, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
+				voltEngate  = map(entradaEngate, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
+				marcha = calcularMarcha(voltSelecao,voltEngate);
+
+				//Serial.print("entradaSelecao:");
+				//Serial.print(voltSelecao);
+
+				//Serial.print("entradaEngate:");
+				//Serial.print(voltEngate);
+ 
+			}
 			util.reIniciaTimer4();
-			marcha = calcularMarcha(voltSelecao,voltEngate);
 		}
 		return marcha;
 
