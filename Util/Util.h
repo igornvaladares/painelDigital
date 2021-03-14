@@ -162,6 +162,12 @@ public:
 	 
  	}
 
+	
+	bool fequal(float a, float b)
+	{
+		float precision = 0.01;
+ 		return fabs(a-b) < precision;
+	}
 
 };
  
