@@ -13,7 +13,7 @@ private:
 	int nivelMemoriaTemperatura=0;
 	float contPulsoAnt;
 	unsigned char contPulso;
-	float contPulsoEstavel;
+	float contPulsoEstavel ;
 
 
    public:
@@ -44,38 +44,37 @@ private:
 				contPulsoAnt = contPulso;
 
 			pulso->reiniciarRpm();
-			//Serial.println("Pulso RPM:");							
-			//Serial.println(countPulso);			
 		}
+		if (!util.fequal(contPulsoAnt,contPulsoEstavel))
+			if (contPulsoAnt > contPulsoEstavel)
+				contPulsoEstavel+=0.10f;
+			else 
+				contPulsoEstavel-=0.10f;
 
-		if (contPulsoAnt > contPulsoEstavel)
-			contPulsoEstavel+=0.25;
-		else if (contPulsoAnt < contPulsoEstavel)
-			contPulsoEstavel-=0.25 ;
-	
-		return (int)contPulsoEstavel*120;
+
+		return (int)(contPulsoEstavel*120);
 
 	}
  
 	double obterVelocidade(){
-
 		if (util.saidaTimer1()){
 			util.reIniciaTimer1();	
-			long countPulso = pulso->getPulsoVelocidade();
-			pulso->reiniciarVelocidade();
+			unsigned int countPulso = pulso->getPulsoVelocidade();
+			unsigned char PULSO_POR_VOLTA=15; 
+			float DIAMETRO_RODA= 0.6573; 
+			float FATOR_MS_KMH = 3.6;
 
-			double diametroRoda = 65.73/100; 
-			double fatorMsParaKmh = 3.6;
-			int pulsoPorVolta=32; 
-			int rpmV;
-			double hz; 
-			rpmV = countPulso*60/pulsoPorVolta;
+			pulso->reiniciarVelocidade();
+			float rpmV;
+			float hz; 
+			rpmV = (float)countPulso*60/PULSO_POR_VOLTA;
 			hz = rpmV /60;
-			wKMporH = PI*hz*diametroRoda*fatorMsParaKmh; 
+			wKMporH = (float)PI*hz*DIAMETRO_RODA*FATOR_MS_KMH; 
 			
 		
 		}
 		
+		//Serial.println(wKMporH);	
 		return wKMporH;
 
 
@@ -85,7 +84,7 @@ private:
 	int obterTemperaturaAguaRadiador(){
 
 		if (util.saidaTimer2()){
-			//OBS: Meio do Tanque a partir de 0,74 Volts e ventoinha liga a partir de 0.60v	(95 graus)
+			//OBS: Meio do Tanque a partir de 0,74 Volts e ventoinha liga a partir de 0.626v	(95 graus)
 
 			//float voltPorUnidade = 0.004887586;
 			int nivelAtual;
@@ -95,18 +94,18 @@ private:
 			//Serial.println("pintemperatura");
 			//Serial.print(temperatura);
 			
-			//	440un -> 40 Graus
-			//	125un - 97 Graus
+			//	403un -> 47 Graus
+			//	122un - 97 Graus
 			//	_________
-			// 	315 - 57 
+			// 	281 - 50 
 			//	 X  - 1	
-			// x=  5.52
-			// 1024 / 5.52 = 185
-
+			// x=  5.62
+			// 1024 / 5.62 = 182	
+			//nivelAtual = 122;
 			
 			// Diferenca 65
 			if (nivelAtual >0){
-				nivelAtual = map(nivelAtual, 1023,0 ,0, 185)-74;
+				nivelAtual = map(nivelAtual, 1023,0 ,0, 182)-70;
 				if (nivelMemoriaTemperatura ==0) nivelMemoriaTemperatura = nivelAtual;
 				if (nivelAtual < nivelMemoriaTemperatura){
 					//Oscilando para baixo
@@ -119,12 +118,13 @@ private:
 				}
 
 			
-				//Serial.print("-");								
-				//Serial.println(temperatura);				
+						
 			}
+
 			util.reIniciaTimer2();
 		}
-
+		//Serial.print("temperatura");								
+		//Serial.println(nivelMemoriaTemperatura);		
 		return nivelMemoriaTemperatura;	
 	}
 
