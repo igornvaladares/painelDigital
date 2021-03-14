@@ -4,10 +4,10 @@
 #define ENDERECO_MODOAUTOMATICO 2
 #define ESTADO_PAINEL_LIGADO 1
 
-#define TIMER_1 500 // Um segundo ( RPM, Velocidade,Odometro (1000 > 500 > 250 > 125)
-#define TIMER_2 10000 // leitura de 5 em 5 segundos ( temperatura)
-#define TIMER_3 10000 // leitura de 5 em 5 segundos ( nivel combustivel)
-#define TIMER_4 500 // se demorar 1 segundo, alternar modo automativo < - >  Manual
+#define TIMER_1 500 // 1/2 segundo ( RPM, Velocidade))
+#define TIMER_2 10000 // leitura de 10 em 10 segundos ( temperatura)
+#define TIMER_3 60000 // leitura de 60 em 60 segundos ( nivel combustivel)
+#define TIMER_4 1000 // leitura de 1 em 1 segundo (marcha engatada)
 #define TIMER_5 60000 // se demorar 1m com RPM = 0 , desligar android
 #include <Motor.h>
 #include <Cambio.h>
@@ -23,8 +23,8 @@
 // INTERRUPCAO
 //Mega 2, 3, 18, 19, 20, 21    
                              
-//sRealDash realDash(&Serial,230400); 
-RealDash realDash(&Serial,115200); 
+RealDash realDash(&Serial,230400); 
+//RealDash realDash(&Serial,115200); 
 EventosExternos evento(52); // Porta de saida para desligar o Android
 
 Cambio cambio(A0,A1,A2,A3,A4); //Porta Analogica de Seleção , Engate, pressao dualogic, pin1Joystick , pin2Joystick 
@@ -53,10 +53,11 @@ void loop()
  
  //----------------------------<Digitais>----------------------------
  rpm = motor.obterRpm(); 
- evento.gerenciarPower(rpm);
    
  velocidade = motor.obterVelocidade();
- 
+
+ evento.gerenciarPower(rpm);
+
  sensores = bordo.obterSensoresDigitais();
 
  
@@ -71,8 +72,8 @@ void loop()
 
  //pressaoDualogic = cambio.obterPressaoDualogic();
 
-//Serial.print("marcha:");
-//Serial.println(marcha);
+//Serial.print("RPM:");
+//Serial.println(rpm);
  
  // usa o binario dos sensores para adicionar mais um bit caso estivre selecionado o modo automático
  //ensores = cambio.obterModoAutomatico(sensores);
@@ -83,30 +84,7 @@ void loop()
  ///Serial.println(sensores);
  nivelCombustivel = bordo.obterNivelCombustivel(); // reinicia o (TIMER2)
  //----------------------------</Analogicos>----------------------------
- //Serial.print("combustivel:");
- //Serial.println(nivelCombustivel);
- 
- //Serial.print("temperatura :");
- //Serial.println(temperatura);
 
- //Serial.print("Marcha:");
- //Serial.println(marcha);
-
- //cont+=30;
-//if (cont>8000) cont =0;
-//Serial.print("cont :");
-//Serial.println(cont);
-
- //Serial.print("rpm :");
- //Serial.println(rpm);
- //Serial.print("- Velocidade:");
-//Serial.print(velocidade);
-
-//pressaoDualogic=55;
-//velocidade = 120;
-//if (rpm >8000)
-//rpm =0;
-//rpm = rpm +10;
  enviarParaRealDash(rpm, velocidade, temperatura,nivelCombustivel, 
                    marcha,pressaoDualogic,sensores);
 
