@@ -98,7 +98,10 @@ private:
 				// 2.1 % 5 % 0.004887586 = 86	
 				// 1.5 % 5 % 0.004887586 = 61	
 
-				nivelAtual=map(sensorNivelCombustivel_Aux,280,61,0,100);			
+				nivelAtual=map(sensorNivelCombustivel_Aux,280,61,0,100);
+				if (abs(nivelAtual-nivelEstavel)>=20){
+					nivelEstavel = nivelAtual;
+				}				
 				//Serial.print("volt:");
 				//Serial.println(sensorNivelCombustivel*voltPorUnidade);
 
@@ -107,8 +110,6 @@ private:
 
 
 			if (nivelEstavel==0) nivelEstavel = nivelAtual;
-
-
 
 			if (nivelAtual < nivelEstavel){
 				//Oscilando para baixo
