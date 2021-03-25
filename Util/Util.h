@@ -129,7 +129,7 @@ public:
 
 		}else return false;
 	}   
-
+   
 	double estabilizarEntrada(uint8_t pinAnalogico){
 	
 		double mediaAnaLogico=0;
