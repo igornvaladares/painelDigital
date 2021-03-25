@@ -91,8 +91,6 @@ class Cambio
 			int voltEngate, entradaEngate; 
 			entradaSelecao = util.estabilizarEntrada(PinSelecao);
 			entradaEngate = util.estabilizarEntrada(PinEngate);
-			//tradaSelecao = 100;
-			//entradaEngate = 100;
 			if (entradaEngate>0 && entradaSelecao>0){
 				voltSelecao = map(entradaSelecao, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
 				voltEngate  = map(entradaEngate, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			

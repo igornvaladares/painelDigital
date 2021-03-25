@@ -17,6 +17,8 @@ private:
 
    long Tempo5 = 0;
    unsigned long Delay5 = 0;
+   unsigned long Tempo6 = 0;
+   unsigned long Delay6 = 0;
 
 public:
 	Util()
@@ -129,7 +131,7 @@ public:
 
 		}else return false;
 	}   
-
+   
 	double estabilizarEntrada(uint8_t pinAnalogico){
 	
 		double mediaAnaLogico=0;

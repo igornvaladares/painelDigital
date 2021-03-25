@@ -4,11 +4,11 @@
 #define ENDERECO_MODOAUTOMATICO 2
 #define ESTADO_PAINEL_LIGADO 1
 
-#define TIMER_1 500 // 1/2 segundo ( RPM, Velocidade))
-#define TIMER_2 10000 // leitura de 10 em 10 segundos ( temperatura)
-#define TIMER_3 60000 // leitura de 60 em 60 segundos ( nivel combustivel)
-#define TIMER_4 1000 // leitura de 1 em 1 segundo (marcha engatada)
-#define TIMER_5 60000 // se demorar 1m com RPM = 0 , desligar android
+#define TIMER_1 250 // Um segundo ( RPM, Velocidade,Odometro (1000 > 500 > 250 > 125)
+#define TIMER_2 2000 // leitura de 2 em 2 segundos ( temperatura)
+#define TIMER_3 3000 // leitura de 5 em 5 segundos ( nivel combustivel)
+#define TIMER_4 1000 // se demorar 1 segundo, alternar modo automativo < - >  Manual
+#define TIMER_5 20000 // se demorar 5 segundo com RPM = 0 , desligar android
 #include <Motor.h>
 #include <Cambio.h>
 #include <Bordo.h>
@@ -23,14 +23,14 @@
 // INTERRUPCAO
 //Mega 2, 3, 18, 19, 20, 21    
                              
-RealDash realDash(&Serial,230400); 
-//RealDash realDash(&Serial,115200); 
+//RealDash realDash(&Serial,230400); 
+RealDash realDash(&Serial,115200); 
 EventosExternos evento(52); // Porta de saida para desligar o Android
 
 Cambio cambio(A0,A1,A2,A3,A4); //Porta Analogica de Seleção , Engate, pressao dualogic, pin1Joystick , pin2Joystick 
 Motor motor(digitalPinToInterrupt(2),digitalPinToInterrupt(3),A5);//uint8_t pinRotacao, (interrupção) uint8_t pinVelocidade, (interrupção) uint8_t pinTemperaturaAguaRadiador
-Bordo bordo(A14,A15);//uint8_t pinNivelCombustível1, uint8_t pinNivelCombustível21
-//int cont=0;
+Bordo bordo(A14,A15);//uint8_t pinNivelCombustível1, uint8_t pinNivelCombustível2
+
 void setup(void)
 {
 
@@ -43,6 +43,7 @@ void loop()
      
  
  int rpm;
+ double km;
  double velocidade;
  int temperatura;
  int marcha;
@@ -53,11 +54,12 @@ void loop()
  
  //----------------------------<Digitais>----------------------------
  rpm = motor.obterRpm(); 
-   
- velocidade = motor.obterVelocidade();
-
  evento.gerenciarPower(rpm);
-
+ 
+ km = motor.obterOdometro();
+  
+ velocidade = motor.obterVelocidade();
+ 
  sensores = bordo.obterSensoresDigitais();
 
  
@@ -70,21 +72,43 @@ void loop()
  
  marcha = cambio.obterMarchaEngatada();
 
- //pressaoDualogic = cambio.obterPressaoDualogic();
+ pressaoDualogic = cambio.obterPressaoDualogic();
 
-//Serial.print("RPM:");
-//Serial.println(rpm);
+//Serial.print("pressaoDualogic:");
+//Serial.println(pressaoDualogic);
  
  // usa o binario dos sensores para adicionar mais um bit caso estivre selecionado o modo automático
  //ensores = cambio.obterModoAutomatico(sensores);
  
- //Serial.print("Sensores:");
- //Serial.println(PriUint64<DEC>(sensores));
+// Serial.print("Sensores:");
+// Serial.println(PriUint64<DEC>(sensores));
  
- ///Serial.println(sensores);
  nivelCombustivel = bordo.obterNivelCombustivel(); // reinicia o (TIMER2)
  //----------------------------</Analogicos>----------------------------
+ //Serial.print("combustivel:");
+ //Serial.println(nivelCombustivel);
+ 
+ //Serial.print("temperatura :");
+ //Serial.println(temperatura);
 
+ //Serial.print("Marcha:");
+ //Serial.println(marcha);
+
+ //Serial.print("rpm :");
+ //Serial.println(rpm);
+ //Serial.print("- Velocidade:");
+//Serial.print(velocidade);
+
+//pressaoDualogic=55;
+//velocidade = 120;
+//if (rpm >8000)
+//rpm =0;
+//rpm = rpm +10;
+
+//rpm = 3500; 
+//nivelCombustivel = 60;
+//temperatura= 90;
+//marcha=3;
  enviarParaRealDash(rpm, velocidade, temperatura,nivelCombustivel, 
                    marcha,pressaoDualogic,sensores);
 
