@@ -8,8 +8,8 @@ class Pulso : public Interrupt{
     	long countPulsoVelocidade;
 	const unsigned long ZeroTimeout = 100000;  // For high response time, a good value would be 100000.
 	volatile unsigned long LastTimeWeMeasured;  // Stores the last time we measured a pulse so we can calculate the period.
-	volatile unsigned long PeriodBetweenPulses; // Stores the period between pulses in microseconds.
-	volatile unsigned long PeriodAverage;  // Stores the period between pulses in microseconds in total, if we are taking multiple pulses.
+	volatile unsigned long PeriodBetweenPulses = ZeroTimeout+1000;  // Stores the period between pulses in microseconds.
+	volatile unsigned long PeriodAverage = ZeroTimeout+1000;  // Stores the period between pulses in microseconds in total, if we are taking multiple pulses.
 	unsigned int PulseCounter = 1;  // Counts the amount of pulse readings we took so we can average multiple pulses before calculating the period.
 	unsigned long PeriodSum; // Stores the summation of all the periods to do the average.
 	unsigned long LastTimeCycleMeasure = LastTimeWeMeasured;  // Stores the last time we measure a pulse in that cycle.

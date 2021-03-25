@@ -16,10 +16,9 @@ private:
 	const unsigned long ZeroTimeout = 100000;  
 	byte numReadings = 2; 
 	volatile unsigned long LastTimeWeMeasured;  // Stores the last time we measured a pulse so we can calculate the period.
-	volatile unsigned long PeriodBetweenPulses = ZeroTimeout+1000;  // Stores the period between pulses in microseconds.
-	volatile unsigned long PeriodAverage = ZeroTimeout+1000;  // Stores the period between pulses in microseconds in total, if we are taking multiple pulses.
+	volatile unsigned long PeriodBetweenPulses; // Stores the period between pulses in microseconds.
+	volatile unsigned long PeriodAverage; // Stores the period between pulses in microseconds in total, if we are taking multiple pulses.
 	unsigned long FrequencyRaw;  // Calculated frequency, based on the period. This has a lot of extra decimals without the decimal point.
-	//unsigned long FrequencyReal;  // Frequency without decimals.
 	unsigned long RPM;  // Raw RPM without any processing.
 	unsigned long LastTimeCycleMeasure = LastTimeWeMeasured;  // Stores the last time we measure a pulse in that cycle.
 	unsigned long CurrentMicros = micros();  // Stores the micros in that cycle.
