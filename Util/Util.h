@@ -83,9 +83,9 @@ public:
 
 	bool saidaTimer3() {
 
-	    if ((millis() - Delay3) > Tempo3) { 
-		
-			return true;
+	    if (((millis() - Delay3) > Tempo3)&&(millis()>Delay3)) { 
+
+		return true;
 
 		}else return false;
 	}      

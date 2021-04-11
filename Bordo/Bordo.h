@@ -15,6 +15,7 @@ private:
 	uint8_t PinNivelCombustivel2;	
 	int nivelEstavel = 0; //Inicial
 	float voltPorUnidade = 0.004887586;
+	bool ajustarCombstivel=false;
 
 	bool isPortaAberta(uint8_t analogPin){
 		// se maior que 0.5V
@@ -37,7 +38,7 @@ private:
 		PinNivelCombustivel1 = pinNivelCombustivel1;
 		PinNivelCombustivel2 = pinNivelCombustivel2;
 
-		obterNivelCombustivel();
+		//obterNivelCombustivel();
 		util.iniciaTimer3(TIMER_3); // Iniciar timer3 para controle de 'delay'    
 
 		for (int i=PIN_INI; i<=PIN_FIM; i++) {
@@ -48,7 +49,7 @@ private:
 
 	};
 
-	int obterNivelCombustivel(){
+	int obterNivelCombustivel(Motor motor){
 
 		/*
 
@@ -77,7 +78,7 @@ private:
 
 		if (util.saidaTimer3()){
 
-
+			long s = motor.obterVelocidade();
 			int nivelAtual=0;			
 			float sensorNivelCombustivel=0; 
 		
@@ -89,19 +90,22 @@ private:
 			sensorNivelCombustivel_Aux2 = util.estabilizarEntrada(PinNivelCombustivel2);
 
 			sensorNivelCombustivel_Aux = abs(sensorNivelCombustivel_Aux2 - sensorNivelCombustivel_Aux1);
-
-
 			//(0-25)
 			if (sensorNivelCombustivel_Aux>0){
-
 				// 6.66 % 5 % 0.004887586 = 272	
 				// 2.1 % 5 % 0.004887586 = 86	
 				// 1.5 % 5 % 0.004887586 = 61	
 
 				nivelAtual=map(sensorNivelCombustivel_Aux,280,61,0,100);
-				if (abs(nivelAtual-nivelEstavel)>=20){
-					nivelEstavel = nivelAtual;
-				}				
+				if (abs(nivelAtual-nivelEstavel)>=15){
+					if (ajustarCombstivel){
+						nivelEstavel = nivelAtual;
+					}
+
+					ajustarCombstivel = true;
+				}else ajustarCombstivel = false;
+
+			
 				//Serial.print("volt:");
 				//Serial.println(sensorNivelCombustivel*voltPorUnidade);
 
@@ -115,15 +119,7 @@ private:
 				//Oscilando para baixo
 				nivelEstavel--;
 				
-			}else{
-
-				if (nivelAtual > nivelEstavel){
-					//Oscilando para cima
-					nivelEstavel++;
-
-				}
 			}
-
 			util.reIniciaTimer3();	
 		}
 

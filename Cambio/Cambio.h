@@ -22,7 +22,7 @@ class Cambio
 					 	marcha= 6; //  5 - Marcha
 					 break;
 					 case 200 ... 269:
-					 	marcha= 1;  // NEUTRO
+				//	 	marcha= 1;  // NEUTRO
 					 break;
 					 case 270 ... 500: //  ESQUEDA
 					 	marcha= 0; // Ré
@@ -48,7 +48,7 @@ class Cambio
 					 	marcha = 2; // 1 - Marcha
 					 break;
 					 case 200 ... 269:
-					 	marcha = 1;  // NEUTRO
+				//	 	marcha = 1;  // NEUTRO
 					 break;
 					 case 270 ... 500:  //  ESQUEDA
 					 	marcha = 3; // 2 - Marcha
@@ -91,7 +91,7 @@ class Cambio
 			int voltEngate, entradaEngate; 
 			entradaSelecao = util.estabilizarEntrada(PinSelecao);
 			entradaEngate = util.estabilizarEntrada(PinEngate);
-			if (entradaEngate>0 && entradaSelecao>0){
+			if (entradaEngate>50 && entradaSelecao>50){
 				voltSelecao = map(entradaSelecao, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
 				voltEngate  = map(entradaEngate, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
 				marcha = calcularMarcha(voltSelecao,voltEngate);

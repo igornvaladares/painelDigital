@@ -9,7 +9,8 @@ class Motor{
 private:
 	Pulso * pulso; 
 	Util util;
-	double wKMporH ;
+	double wKMporH;
+	float distanciaPercorrida;
 	uint8_t PinTemperaturaAguaRadiador;
 	int nivelMemoriaTemperatura=0;
 	const byte PulsesPerRevolution = 1;  // Set how many pulses there are on each revolution. Default: 2.
@@ -45,7 +46,9 @@ private:
   		
 		
 	};
-      
+       float obterDistanciaPercorrida(){
+		return distanciaPercorrida;
+       }      
        unsigned long obterRpm(){
 		volatile unsigned long * arrayPulso = pulso->getPulsoRpm();
 		PeriodAverage = arrayPulso[0];
@@ -96,7 +99,7 @@ private:
 			unsigned char PULSO_POR_VOLTA=15; 
 			float DIAMETRO_RODA= 0.6573; 
 			float FATOR_MS_KMH = 3.6;
-
+			distanciaPercorrida +=(countPulso/PULSO_POR_VOLTA)*PI;
 			pulso->reiniciarVelocidade();
 			float rpmV;
 			float hz; 
