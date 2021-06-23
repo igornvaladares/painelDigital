@@ -8,10 +8,7 @@ class Cambio
         uint8_t PinSelecao;
         uint8_t PinEngate;
 	uint8_t PinPressaoDualogic;
-	uint8_t Pin1Joystick;
-	uint8_t Pin2Joystick;
 	signed char marcha= 1; // Neutro
-	bool modoAutomatico;
 
 	signed char calcularMarcha(int voltSelecao, int voltEngate){
             
@@ -69,16 +66,11 @@ class Cambio
 		pinMode(pinEngate, INPUT);
 		pinMode(PinPressaoDualogic, INPUT);
 		
-		pinMode(pin1Joystick, INPUT);
-		pinMode(pin2Joystick, INPUT);
-
+	
 		PinSelecao = pinSelecao;
 		PinEngate = pinEngate;
 		PinPressaoDualogic = pinPressaoDualogic;
-		Pin1Joystick = pin1Joystick;
-		Pin2Joystick = pin2Joystick;
-
-		modoAutomatico= EEPROM.read(ENDERECO_MODOAUTOMATICO);
+	
 		util.iniciaTimer4(TIMER_4); // Iniciar timer4 para controle de 'delay'    
 
 	}
@@ -133,48 +125,6 @@ class Cambio
 
 	}
 
-	unsigned long int obterModoAutomatico(unsigned long int sensores){
-
-
-
-		int volt1 = map(util.estabilizarEntrada(Pin1Joystick), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA); //Fio2			
-		int volt2  = map(util.estabilizarEntrada(Pin2Joystick), 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA); //Fio3			
-
-		
-
-		switch (volt1) {
-			case 70 ... 210:
-			switch (volt2) {
-				case 70 ... 210: 
-					if (util.saidaTimer4()){ // se a ação demorar "TIMER4" segundos
-						
-						modoAutomatico =! modoAutomatico;
-						EEPROM.write(modoAutomatico,ENDERECO_MODOAUTOMATICO);
-						util.reIniciaTimer4();
-						//Serial.print("Sensores:");
-						//		Serial.print(volt1);
-						//		Serial.print("-");
-						//		Serial.println(volt2);
-					}
-					break;	
-				default: 
-					util.reIniciaTimer4();
-			}
-			break;
-		default:
-			 util.reIniciaTimer4();		
-		
-		}
-
-		if (modoAutomatico) // 28 = ultimo bit para sensor, portanto o bit 29 vai dizer ao realdash a indicção do modo automativo
-		    sensores |= (1UL << 29);
-
-
-         	return sensores;
-
-
-
-	}
 
 };
 

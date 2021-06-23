@@ -1,12 +1,13 @@
 #include "Arduino.h"
 //Mega
 //#define PIN_INI 22
-#define PIN_INI 27
+#define PIN_INI 28
 //PIN 28 "NAO USAR POIS é apenas de indicação no .xml para o RealDash( AlgoAberto) "
 #define PIN_FIM 50
-#define PIN_CAPO 27
+#define PIN_CAPO 28
 //#define PIN_PORTAS PIN_INI + 6
 #define BIT_ALGOABERTO 6
+#define DESVIO_LEITURA_COMBS 1
 class Bordo{ 
 
 private:
@@ -14,9 +15,16 @@ private:
 	uint8_t PinNivelCombustivel1;
 	uint8_t PinNivelCombustivel2;	
 	int nivelEstavel = 0; //Inicial
+	int incrementarCombs = false; //Inicial
+	int decrementarCombs = false; //Inicial
+
+	int nivelEstavelAnt = 0; //Inicial
+	int deltaNivelEstavel =0;
+	float distanciaAnt =0;
+	float deltaDistancia=0;
+
 	float voltPorUnidade = 0.004887586;
 	bool ajustarCombstivel=false;
-
 	bool isPortaAberta(uint8_t analogPin){
 		// se maior que 0.5V
 		//Serial.println(util.estabilizarEntrada(analogPin) * voltPorUnidade);
@@ -28,7 +36,7 @@ private:
 		return true;
 
 	}
-   public:
+       public:
 
         Bordo(uint8_t pinNivelCombustivel1, uint8_t pinNivelCombustivel2){
 		
@@ -38,9 +46,9 @@ private:
 		PinNivelCombustivel1 = pinNivelCombustivel1;
 		PinNivelCombustivel2 = pinNivelCombustivel2;
 
-		//obterNivelCombustivel();
+		
 		util.iniciaTimer3(TIMER_3); // Iniciar timer3 para controle de 'delay'    
-
+		nivelEstavel = obterNivelCombustivelMemoria();
 		for (int i=PIN_INI; i<=PIN_FIM; i++) {
 
 			pinMode(i,INPUT_PULLUP);
@@ -48,8 +56,20 @@ private:
 		}
 
 	};
-
-	int obterNivelCombustivel(Motor motor){
+        float obterConsumo(float distancia){
+		
+				
+		if (util.saidaTimer3()){
+			deltaDistancia = distancia-distanciaAnt;
+			deltaNivelEstavel = nivelEstavel -nivelEstavelAnt;
+	
+			distanciaAnt=distancia;
+			nivelEstavelAnt=nivelEstavel;
+		}
+		return deltaDistancia / (deltaNivelEstavel*0.6) ;
+	
+	}
+	int obterNivelCombustivel(){
 
 		/*
 
@@ -75,29 +95,27 @@ private:
 
 
 		*/
-
 		if (util.saidaTimer3()){
 
-			long s = motor.obterVelocidade();
+			
 			int nivelAtual=0;			
 			float sensorNivelCombustivel=0; 
 		
 			float sensorNivelCombustivel_Aux =0;
 			float sensorNivelCombustivel_Aux1 =0;
 			float sensorNivelCombustivel_Aux2 =0;
-
 			sensorNivelCombustivel_Aux1 = util.estabilizarEntrada(PinNivelCombustivel1);
 			sensorNivelCombustivel_Aux2 = util.estabilizarEntrada(PinNivelCombustivel2);
-
 			sensorNivelCombustivel_Aux = abs(sensorNivelCombustivel_Aux2 - sensorNivelCombustivel_Aux1);
 			//(0-25)
 			if (sensorNivelCombustivel_Aux>0){
-				// 6.66 % 5 % 0.004887586 = 272	
+				// 6.53 % 5 % 0.004887586 = 268
 				// 2.1 % 5 % 0.004887586 = 86	
-				// 1.5 % 5 % 0.004887586 = 61	
-
-				nivelAtual=map(sensorNivelCombustivel_Aux,280,61,0,100);
-				if (abs(nivelAtual-nivelEstavel)>=15){
+				// 1.49 % 5 % 0.004887586 = 61	
+			
+				//nivelAtual=map(sensorNivelCombustivel_Aux,280,61,0,100);
+				nivelAtual=map(sensorNivelCombustivel_Aux,269,61,0,100);
+				if (abs(nivelAtual-nivelEstavel)>=20){
 					if (ajustarCombstivel){
 						nivelEstavel = nivelAtual;
 					}
@@ -115,10 +133,20 @@ private:
 
 			if (nivelEstavel==0) nivelEstavel = nivelAtual;
 
-			if (nivelAtual < nivelEstavel){
+			if (nivelAtual < (nivelEstavel - DESVIO_LEITURA_COMBS)){
 				//Oscilando para baixo
-				nivelEstavel--;
-				
+				if (decrementarCombs){
+					nivelEstavel-= DESVIO_LEITURA_COMBS;
+					salvarNivelCombustivel(nivelEstavel);
+				}
+				decrementarCombs=!decrementarCombs; 		
+			}else{
+				if (nivelAtual > (nivelEstavel + DESVIO_LEITURA_COMBS+1)){
+					//Oscilando para baixo
+					if (incrementarCombs)
+						nivelEstavel+=DESVIO_LEITURA_COMBS;
+					incrementarCombs=!incrementarCombs;
+				}
 			}
 			util.reIniciaTimer3();	
 		}
@@ -137,58 +165,62 @@ private:
 	//22   				  49
 	unsigned long int obterSensoresDigitais(){
 
-		  unsigned long long int digitalPins = 0;
+		 unsigned long long int digitalPins = 0;
 		  int pin_analogico_ini = 8;//A8
 		  int pin_analogico_fim = 12;//A12
-		  int pin_capoo = 27;
-		  int bitposition = 0;
-
+		 
 	          bool algoAberto = false; //4 Portas, Porta-Mala ou Capoo (bits[0 - 5] do .xml ) (4 Portas + Porta Malas)Portas Analogicas
 
-		  for (int i=pin_analogico_ini; i<=pin_analogico_fim; i++) {  
+		  int bitposition = 0; 
+		for (int i=pin_analogico_ini; i<=pin_analogico_fim; i++) {  
 
 			if (isPortaAberta(i)){
 
-				digitalPins |= (1UL << bitposition);
-				algoAberto = true; 
+				//digitalPins |= (1UL << bitposition);
+				//algoAberto = true; 
 
 			}
-			bitposition++;
+			//bitposition++;
 
    	 	  }
-
-
-		  //2^0,2^1,2^2,2^3,2^4 ... ATÉ 2^50  (.XML)
-			//	22    â	 50	
 
 		for (int i=PIN_INI; i<=PIN_FIM; i++) {
 
 		    
-			if (i !=pin_capoo) { // CAPO tem a logica inversa. Low é fechado, hight aberto
+			if (i !=PIN_CAPO ) { // CAPO tem a logica inversa. Low é fechado, hight aberto
 				// Lendo sinais do painel
 				if (digitalRead(i) == LOW){
 					digitalPins |= (1UL << bitposition);
 
 				}
-			}else
-				if (digitalRead(i)){
+			}else{
+				if (digitalRead(i)){ //Capô
 					digitalPins |= (1UL << bitposition);
-					algoAberto = true; 
+	
 				}
+			}
 			bitposition++;
-		  
-		
-
 		  }
 		  //2^6 
-		  //if (algoAberto) digitalPins |= (1 << (PIN_PORTAS - PIN_INI));
-		  if (algoAberto) digitalPins |= (1 << (BIT_ALGOABERTO));
-		  
+		
 		  return digitalPins;
+	} 
 
-	}    
+void salvarNivelCombustivel(int nivel){
+    byte h = highByte(nivel);
+    byte l = lowByte(nivel);
 
+    EEPROM.write(ENDERECO_NIVEL, h);
+    EEPROM.write(ENDERECO_NIVEL+1, l);
 
+}
+int obterNivelCombustivelMemoria(){
+	
+      byte h =  EEPROM.read(ENDERECO_NIVEL);
+      byte l =  EEPROM.read(ENDERECO_NIVEL+1);
+      return word(h,l);
+
+}
 
 };
 

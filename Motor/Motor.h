@@ -131,17 +131,18 @@ private:
 			//Serial.print(temperatura);
 			
 			//	403un -> 47 Graus
-			//	122un - 97 Graus
+			//	127un - 97 Graus
 			//	_________
-			// 	281 - 50 
+			// 	276 - 50 
 			//	 X  - 1	
-			// x=  5.62
-			// 1024 / 5.62 = 182	
-			//nivelAtual = 122;
+			// x=  5.5
+			// 1024 / 5.62 = 186	
+			//nivelAtual = 403;
 			
 			// Diferenca 65
 			if (nivelAtual >0){
-				nivelAtual = map(nivelAtual, 1023,0 ,0, 182)-70;
+				nivelAtual = map(nivelAtual, 1023,0 ,0, 186)-65; 
+				//nivelAtual = map(nivelAtual, 1023,0 ,0, 182)-75; 
 				if (nivelMemoriaTemperatura ==0) nivelMemoriaTemperatura = nivelAtual;
 				if (nivelAtual < nivelMemoriaTemperatura){
 					//Oscilando para baixo
