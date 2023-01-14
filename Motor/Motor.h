@@ -46,11 +46,20 @@ private:
   		
 		
 	};
+       void interropePulso(){
+		pulso->interrompePulso();
+       }
+       void iniciaPulso(){
+		pulso->iniciaPulso();
+       }
+
        float obterDistanciaPercorrida(){
 		return distanciaPercorrida;
        }      
        unsigned long obterRpm(){
 		volatile unsigned long * arrayPulso = pulso->getPulsoRpm();
+
+
 		PeriodAverage = arrayPulso[0];
 		PeriodBetweenPulses = arrayPulso[1];
 		LastTimeWeMeasured = arrayPulso[2];
@@ -96,10 +105,12 @@ private:
 		if (util.saidaTimer1()){
 			util.reIniciaTimer1();	
 			unsigned int countPulso = pulso->getPulsoVelocidade();
+			//Serial.print("pulso B:");
+			//Serial.println(countPulso);
 			unsigned char PULSO_POR_VOLTA=15; 
 			float DIAMETRO_RODA= 0.6573; 
 			float FATOR_MS_KMH = 3.6;
-			distanciaPercorrida +=(countPulso/PULSO_POR_VOLTA)*PI;
+			//distanciaPercorrida +=(countPulso/PULSO_POR_VOLTA)*PI;
 			pulso->reiniciarVelocidade();
 			float rpmV;
 			float hz; 
