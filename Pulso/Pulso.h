@@ -19,13 +19,15 @@ class Pulso : public Interrupt{
       Pulso(uint8_t pinRotacao, uint8_t pinVelocidade){
       PinRotacao = pinRotacao;
       PinVelocidade = pinVelocidade;
-      pinMode(pinRotacao, INPUT);
-      pinMode(pinVelocidade, INPUT);
-      attach(pinRotacao, FALLING);
-      attach(pinVelocidade, FALLING);
+      iniciaPulso();
 
     }
 
+   void iniciaPulso(){
+      attach(PinRotacao, FALLING);
+      attach(PinVelocidade, FALLING);
+
+    }
      volatile unsigned long * getPulsoRpm(){
 	 return arrayPulso;
      }    
@@ -36,7 +38,11 @@ class Pulso : public Interrupt{
     long reiniciarVelocidade(){
 	 countPulsoVelocidade=0;
      }    
+    void interrompePulso(){
+	detach(PinRotacao);
+	detach(PinVelocidade);
 
+    }
     // Função Executada na interrupcao
     void volatile execInterrupt(uint8_t interruptNum){
 	
