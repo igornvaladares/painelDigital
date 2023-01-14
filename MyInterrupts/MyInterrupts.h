@@ -38,12 +38,12 @@ class Interrupt;  //declaracao previa
  class Interrupt {
   public:
      void attach(uint8_t interruptNum, int mode) {  attachInterrupt(interruptNum, this, mode); };
+     void detach(uint8_t interruptNum) {  detachInterrupt(interruptNum); };
+
     void volatile virtual execInterrupt(uint8_t interruptNum);
 };
 
-  Interrupt * interruptObjects[EXTERNAL_NUM_INTERRUPTS];
-//static volatile voidFuncPtr intFunc[EXTERNAL_NUM_INTERRUPTS];
-// volatile static voidFuncPtr twiIntFunc;
+ Interrupt * interruptObjects[EXTERNAL_NUM_INTERRUPTS];
 
  void attachInterrupt(uint8_t interruptNum, Interrupt * interruptObject, int mode) {
   
