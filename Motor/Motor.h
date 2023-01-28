@@ -30,9 +30,27 @@ private:
 	unsigned long total;  // The running total.
 	unsigned long average;  // The RPM value after applying the smoothing.
 
+	int velocidadeAnt = 0;
+	int velocidadeIntAnt = 0;
+
+	bool isDesacelerandoPorDesvio(int velocidade, int desvio){
+
+		if (velocidade >= velocidadeAnt-desvio){
+			velocidadeAnt = velocidade;
+			return false;
+		}else{
+			velocidadeAnt = 0;
+			return true;
+		}
+  	}
+
+	
+	int doubleToInt(float velocidade){
+		 return int ((velocidade) * 100);
+	}
 
 
-   public:
+	public:
         Motor(uint8_t pinRotacao,uint8_t pinVelocidade,uint8_t pinTemperaturaAguaRadiador){
 	
 		pinMode(pinRotacao, INPUT);
@@ -41,23 +59,77 @@ private:
 		PinTemperaturaAguaRadiador = pinTemperaturaAguaRadiador;
 		pulso = new Pulso(pinRotacao,pinVelocidade);
 
-		util.iniciaTimer1(TIMER_1); // Iniciar timer1 para controle de 'delay'
-		util.iniciaTimer2(TIMER_2); // Iniciar timer1 para controle de 'delay'
-  		
+		util.iniciaTimer1(TIMER_1); 
+		util.iniciaTimer2(TIMER_2); 
+  		util.iniciaTimer3(TIMER_3); 
 		
 	};
+
+	bool isEstabilizouVelocidade(double velocidade){
+  	 
+	   int velocidadeInt = doubleToInt(velocidade);
+	
+	   bool retorno =false;
+
+		if (util.saidaTimer3()){
+		  
+		    util.reIniciaTimer3();
+	        int deltaVelocidade = velocidadeInt - velocidadeIntAnt;
+		    retorno =  ((deltaVelocidade) >= -33 && (deltaVelocidade) <= 0);
+		    velocidadeIntAnt = velocidadeInt;
+
+
+		}
+		return retorno;
+	}
+	
+
+	bool isDesacelerando(double velocidade){
+
+
+	  if (util.saidaTimer2()){
+
+	      util.reIniciaTimer2();
+
+	      int velocidadeInt = doubleToInt(velocidade);
+	      switch (velocidadeInt){
+       	       case 6000 ... 6249:
+	          return isDesacelerandoPorDesvio(velocidadeInt, 100);
+	       case 6250 ... 6499:
+        	  return isDesacelerandoPorDesvio(velocidadeInt, 50);
+	       case 6500 ... 6999:
+        	  return isDesacelerandoPorDesvio(velocidadeInt, 25);
+	       case 7000 ... 7500:
+        	  return isDesacelerandoPorDesvio(velocidadeInt, 10);
+	       case 7501 ... 8000:
+        	  return isDesacelerandoPorDesvio(velocidadeInt, 5);
+	       case 8001 ... 10000:
+        	  return isDesacelerandoPorDesvio(velocidadeInt, 1);
+		   case 10001 ... 16000:
+				return isDesacelerandoPorDesvio(velocidadeInt, 0);
+
+	        defaut:
+        	  return false;
+	      }
+        
+ 	 }
+
+	  return false;
+
+	}
+
        void interropePulso(){
-		pulso->interrompePulso();
+            pulso->interrompePulso();
        }
        void iniciaPulso(){
-		pulso->iniciaPulso();
+		    pulso->iniciaPulso();
        }
 
        float obterDistanciaPercorrida(){
-		return distanciaPercorrida;
+            return distanciaPercorrida;
        }      
        unsigned long obterRpm(){
-		volatile unsigned long * arrayPulso = pulso->getPulsoRpm();
+	   volatile unsigned long * arrayPulso = pulso->getPulsoRpm();
 
 
 		PeriodAverage = arrayPulso[0];
@@ -105,8 +177,6 @@ private:
 		if (util.saidaTimer1()){
 			util.reIniciaTimer1();	
 			unsigned int countPulso = pulso->getPulsoVelocidade();
-			//Serial.print("pulso B:");
-			//Serial.println(countPulso);
 			unsigned char PULSO_POR_VOLTA=15; 
 			float DIAMETRO_RODA= 0.6573; 
 			float FATOR_MS_KMH = 3.6;
@@ -117,11 +187,8 @@ private:
 			rpmV = (float)countPulso*60/PULSO_POR_VOLTA;
 			hz = rpmV /60;
 			wKMporH = (float)PI*hz*DIAMETRO_RODA*FATOR_MS_KMH; 
-			
 		
 		}
-		
-		//Serial.println(wKMporH);	
 		return wKMporH;
 
 
@@ -171,8 +238,6 @@ private:
 
 			util.reIniciaTimer2();
 		}
-		//Serial.print("temperatura");								
-		//Serial.println(nivelMemoriaTemperatura);		
 		return nivelMemoriaTemperatura;	
 	}
 
