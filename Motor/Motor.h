@@ -94,7 +94,7 @@ public:
 			if (velocidadeInt > 7001)
 				util.iniciaTimer3(TIMER_3 / 2);
 			if (velocidadeInt > 7501)
-				util.iniciaTimer3(TIMER_3 / 3);
+				util.iniciaTimer3(TIMER_3 / 2.5);
 			if (velocidadeInt < 7001)
 				util.iniciaTimer3(TIMER_3);
 
@@ -104,16 +104,9 @@ public:
 				return ((deltaVelocidade) >= -35 && (deltaVelocidade) <= 0);
 			case 6501 ... 7000:
 				return ((deltaVelocidade) >= -45 && (deltaVelocidade) <= 0);
-			case 7001 ... 7500:
+			case 7001 ... 18500:
 				return ((deltaVelocidade) >= -50 && (deltaVelocidade) <= 0);
-			case 7501 ... 8000:
-				return ((deltaVelocidade) >= -60 && (deltaVelocidade) <= 0);
-			case 8001 ... 8500:
-				return ((deltaVelocidade) >= -75 && (deltaVelocidade) <= 0);
-			case 8501 ... 9000:
-				return ((deltaVelocidade) >= -85 && (deltaVelocidade) <= 0);
-			case 9001 ... 16000:
-				return ((deltaVelocidade) >= -95 && (deltaVelocidade) <= 0);
+		
 			}
 		}
 		return retorno;
