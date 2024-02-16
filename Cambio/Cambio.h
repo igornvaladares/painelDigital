@@ -8,6 +8,7 @@
 #define D 2
 #define N 1
 #define R -1
+#define TIMER_4 500 // leitura de 0.5 em 0.5 segundo (marcha engatada)
 
 class Cambio
 {
@@ -39,43 +40,44 @@ class Cambio
 	
 
 	signed char calcularMarcha(int voltSelecao, int voltEngate){
-            
+          //Engate 0.9  -- 3.8
+		 		// Meio 2.8
 		switch (voltSelecao) {
-			  case 0 ... 199: // EM CIMA
+			  case 0 ... 150: // EM CIMA
 				switch (voltEngate) {
-					 case 0 ... 199: // DIREITA
+					 case 0 ... 150: // DIREITA
 					 	marcha= 6; //  5 - Marcha
 					 break;
-					 case 200 ... 269:
+					 case 151 ... 280:
 				//	 	marcha= 1;  // NEUTRO
 					 break;
-					 case 270 ... 500: //  ESQUEDA
+					 case 281 ... 500: //  ESQUEDA
 					 	marcha= 0; // Ré
 					 break;
 				}
 			 break;
-			 case 200 ... 269: // NO MEIO
+			 case 151 ... 280: // NO MEIO
 				switch (voltEngate) {
-					 case 0 ... 170:// DIREITA
+					 case 0 ... 150:// DIREITA
 					 	marcha = 4; // 3 - Marcha
 					 break;
-					 case 171 ... 269:
+					 case 151 ... 280:
 					 	marcha = 1;  // NEUTRO
 					 break;
-					 case 270 ... 500:  //  ESQUEDA
+					 case 281 ... 500:  //  ESQUEDA
 					 	marcha = 5; // 4 - Marcha
 					 break;
 				}
 			 break;
-			 case 270 ... 500: //EM BAIXO
+			 case 281 ... 500: //EM BAIXO
 				switch (voltEngate) {
-					 case 0 ... 199:// DIREITA
+					 case 0 ... 150:// DIREITA
 					 	marcha = 2; // 1 - Marcha
 					 break;
-					 case 200 ... 269:
+					 case 151 ... 280:
 				//	 	marcha = 1;  // NEUTRO
 					 break;
-					 case 270 ... 500:  //  ESQUEDA
+					 case 281 ... 500:  //  ESQUEDA
 					 	marcha = 3; // 2 - Marcha
 					 break;
 					}
@@ -115,7 +117,7 @@ class Cambio
    
 	bool alavancaAcionadaParaCima(){
 
-	
+	/*
 	Serial.print(" P-");
 	Serial.print(mapToVolt(util.estabilizarEntrada(PinAn4)));
 	Serial.print(" S-");
@@ -124,7 +126,7 @@ class Cambio
 	Serial.print(mapToVolt(util.estabilizarEntrada(PinAn6)));
 	Serial.print(" Q-");
 	Serial.println(mapToVolt(util.estabilizarEntrada(PinAn7)));
-
+*/
 
 	return  (mapToVolt(util.estabilizarEntrada(PinAn4)) > VOLTAGEM_REFERENCIA  && // pin 5 JOYSTICK
         	mapToVolt(util.estabilizarEntrada(PinAn5))  < VOLTAGEM_REFERENCIA  &&
@@ -282,6 +284,13 @@ class Cambio
 
 	}
 
+	Cambio(uint8_t pinPressaoDualogic){
+
+		PinPressaoDualogic = pinPressaoDualogic;
+
+
+	}
+
 	 signed char obterMarchaEngatada(){
 		 
 		 
@@ -299,13 +308,13 @@ class Cambio
 			
 				voltSelecao = map(entradaSelecao, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
 				voltEngate  = map(entradaEngate, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
-				//Serial.print(" Selecao:" );
-				//Serial.print(voltSelecao);
-				//Serial.print(" Engate:" );
-				//Serial.print(voltEngate);
+				Serial.print(" Selecao:" );
+				Serial.print(voltSelecao);
+				Serial.print(" Engate:" );
+				Serial.println(voltEngate);
 				marcha = calcularMarcha(voltSelecao,voltEngate);
-				//Serial.print(" Marcha:" );
-				//Serial.println(marcha);
+				Serial.print(" Marcha:" );
+				Serial.println(marcha-1);
 
 
 			}
