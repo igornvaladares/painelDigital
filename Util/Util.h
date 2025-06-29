@@ -1,3 +1,4 @@
+
 //joana.silva@jarezende.com.br
 //5000-005-000003761-20122000905
 class Util{
@@ -17,6 +18,7 @@ private:
 
    long Tempo5 = 0;
    unsigned long Delay5 = 0;
+
    unsigned long Tempo6 = 0;
    unsigned long Delay6 = 0;
 
@@ -132,6 +134,28 @@ public:
 		}else return false;
 	}   
    
+	void iniciaTimer6(unsigned long delay) {
+
+		Delay2 = delay;
+	
+	}
+
+	void reIniciaTimer6() {
+
+	    Tempo2 = millis();   
+		
+	}
+
+	bool saidaTimer6() {
+
+	    if ((millis() - Delay6) > Tempo6) { 
+		
+			return true;
+
+		}else return false;
+	}      
+   
+
 	double estabilizarEntrada(uint8_t pinAnalogico){
 	
 		double mediaAnaLogico=0;
@@ -174,5 +198,3 @@ public:
 };
  
  
-
-
