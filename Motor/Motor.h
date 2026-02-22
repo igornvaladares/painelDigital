@@ -2,6 +2,9 @@
 #include "Util.h"
 #define VALOR_MIN_TEMP_RADIADOR 20
 #define VALOR_MAX_TEMP_RADIADOR 120
+#define  VALOR_ACELERADOR_MIN_REF 59 //0.59V
+#define  VALOR_ACELERADOR_MAX_REF 110 //1.1v
+#define  VALOR_ACELERADOR_MAX 400 //4.0v
 
 class Motor
 {
@@ -12,6 +15,8 @@ private:
 	double wKMporH;
 	float distanciaPercorrida;
 	uint8_t PinTemperaturaAguaRadiador;
+	uint8_t PinAcelerador;
+
 	int nivelMemoriaTemperatura = 0;
 	const byte PulsesPerRevolution = 1; // Set how many pulses there are on each revolution. Default: 2.
 	const unsigned long ZeroTimeout = 100000;
@@ -31,7 +36,7 @@ private:
 	unsigned long average;	   // The RPM value after applying the smoothing.
 
 	int velocidadeAnt = 0;
-	int velocidadeIntAnt = 0;
+	double velocidade100Ant = 0;
 
 	bool isDesacelerandoPorDesvio(int velocidade, int desvio)
 	{
@@ -56,31 +61,72 @@ private:
 		return retorno;
 	}
 
-	int doubleToInt(float velocidade)
-	{
-		return int((velocidade)*100);
-	}
-
 public:
-	Motor(uint8_t pinRotacao, uint8_t pinVelocidade, uint8_t pinTemperaturaAguaRadiador)
+	Motor(uint8_t pinRotacao, uint8_t pinVelocidade, uint8_t pinTemperaturaAguaRadiador,uint8_t pinAcelerador)
 	{
 
 		pinMode(pinRotacao, INPUT);
 		pinMode(pinTemperaturaAguaRadiador, INPUT);
+		//pinMode(pinVelocidade, INPUT_PULLUP);
 
 		PinTemperaturaAguaRadiador = pinTemperaturaAguaRadiador;
+		PinAcelerador = pinAcelerador;
+
 		pulso = new Pulso(pinRotacao, pinVelocidade);
 
 		util.iniciaTimer1(TIMER_1);
 		util.iniciaTimer2(TIMER_2);
 		util.iniciaTimer3(TIMER_3);
-		util.iniciaTimer6(TIMER_6);
+		util.iniciaTimer5(TIMER_2);
+
 	};
 
+	bool isAliviouAcelerador(){
+
+		bool retorno = false;
+		Serial.print(" S-");
+
+
+		if (util.saidaTimer2())	{
+                   // Serial.println("Le acelerador :");
+
+		   util.reIniciaTimer2(); 
+	           int nivelAcelerador = util.estabilizarEntrada(PinAcelerador);
+	  	
+		   int voltAc = map(nivelAcelerador, 0, 1023, 0, 500);			
+
+		   Serial.print("Acele:");
+  		   Serial.print(voltAc);	
+	  	  return (voltAc>= VALOR_ACELERADOR_MIN_REF && voltAc<= VALOR_ACELERADOR_MAX_REF);
+
+		}
+		return retorno;
+	}
+	bool isPisouFundo(){
+
+		bool retorno = false;
+		Serial.print(" S-");
+
+
+		if (util.saidaTimer5())	{
+                    Serial.println("Le acelerador :");
+
+		   util.reIniciaTimer5(); 
+	           int nivelAcelerador = util.estabilizarEntrada(PinAcelerador);
+	  	
+		   int voltAc = map(nivelAcelerador, 0, 1023, 0, 500);			
+
+		   //Serial.print("Acele:");
+  		   //Serial.println(voltAc);	
+	  	  return (voltAc>=VALOR_ACELERADOR_MAX);
+
+		}
+		return retorno;
+	}
 	bool isEstabilizouVelocidade(double velocidade)
 	{
 
-		int velocidadeInt = doubleToInt(velocidade);
+		double velocidade100 = velocidade*100;
 
 		bool retorno = false;
 
@@ -88,73 +134,14 @@ public:
 		{
 
 			util.reIniciaTimer3();
-			int deltaVelocidade = velocidadeInt - velocidadeIntAnt;
-			velocidadeIntAnt = velocidadeInt;
-
-			if (velocidadeInt > 7001)
-				util.iniciaTimer3(TIMER_3 / 2);
-			if (velocidadeInt > 7501)
-				util.iniciaTimer3(TIMER_3 / 2.5);
-			if (velocidadeInt < 7001)
-				util.iniciaTimer3(TIMER_3);
-
-			switch (velocidadeInt)
-			{
-			case 6000 ... 6500:
-				return ((deltaVelocidade) >= -35 && (deltaVelocidade) <= 0);
-			case 6501 ... 7000:
-				return ((deltaVelocidade) >= -45 && (deltaVelocidade) <= 0);
-			case 7001 ... 18500:
-				return ((deltaVelocidade) >= -50 && (deltaVelocidade) <= 0);
+			double percentualReducao = 100- velocidade100Ant/(velocidade100*100);
+			velocidade100Ant = velocidade100;
+			return (percentualReducao ) < 2;
 		
-			}
 		}
 		return retorno;
 	}
 
-	bool isDesacelerando55a61(double velocidade)
-	{
-
-		if (util.saidaTimer6())
-		{
-
-			util.reIniciaTimer6();
-
-			int velocidadeInt = doubleToInt(velocidade);
-			switch (velocidadeInt)
-			{
-			case 5500 ... 6100:
-				return isDesacelerandoPorDesvio(velocidadeInt, 50);
-
-			defaut:
-				return false;
-			}
-		}
-
-		return false;
-	}
-
-	bool isAcelerando55a61(double velocidade)
-	{
-
-		if (util.saidaTimer2())
-		{
-
-			util.reIniciaTimer2();
-
-			int velocidadeInt = doubleToInt(velocidade);
-			switch (velocidadeInt)
-			{
-			case 5500 ... 6100:
-				return isAcelerandoPorDesvio(velocidadeInt, 0);
-
-			defaut:
-				return false;
-			}
-		}
-
-		return false;
-	}
 
 	void interropePulso()
 	{
@@ -163,11 +150,6 @@ public:
 	void iniciaPulso()
 	{
 		pulso->iniciaPulso();
-	}
-
-	float obterDistanciaPercorrida()
-	{
-		return distanciaPercorrida;
 	}
 	unsigned long obterRpm()
 	{
@@ -223,8 +205,8 @@ public:
 			util.reIniciaTimer1();
 			unsigned int countPulso = pulso->getPulsoVelocidade();
 			unsigned char PULSO_POR_VOLTA = 15;
-			float DIAMETRO_RODA = 0.6573;
-			float FATOR_MS_KMH = 3.6;
+			float DIAMETRO_RODA = 0.63;
+			float FATOR_MS_KMH = 3.4;
 			// distanciaPercorrida +=(countPulso/PULSO_POR_VOLTA)*PI;
 			pulso->reiniciarVelocidade();
 			float rpmV;
@@ -232,10 +214,13 @@ public:
 			rpmV = (float)countPulso * 60 / PULSO_POR_VOLTA;
 			hz = rpmV / 60;
 			wKMporH = (float)PI * hz * DIAMETRO_RODA * FATOR_MS_KMH;
+			if (wKMporH < 4.0){
+			   wKMporH=0;
+			}
 		}
 		return wKMporH;
 	}
-
+/*
 	int obterTemperaturaAguaRadiador()
 	{
 
@@ -285,4 +270,5 @@ public:
 		}
 		return nivelMemoriaTemperatura;
 	}
+*/
 };
