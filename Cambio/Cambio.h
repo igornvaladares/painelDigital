@@ -1,14 +1,15 @@
 #include "Arduino.h"
 #define VOLT_MIN_REFERENCIA 0
 #define VOLT_MAX_REFERENCIA 500
-#define DURACAO_ACAO 300
+#define DURACAO_ACAO 500
 #define VOLTAGEM_REFERENCIA 250 // 2.5 volts
 #define AGUARDAR_PARA_MUDAR_MARCHA 100
 #define AGUARDAR_PARA_MUDAR_AUTO_MANUAL 100
-#define D 2
-#define N 1
-#define R -1
-#define TIMER_4 500 // leitura de 0.5 em 0.5 segundo (marcha engatada)
+uint8_t RE = 0;
+uint8_t NEUTRO = 1;
+uint8_t PRIMEIRA = 2;
+uint8_t QUARTA = 5;
+uint8_t QUINTA = 6;
 
 class Cambio
 {
@@ -21,7 +22,7 @@ class Cambio
 	//Saida
         uint8_t Pin4;
         uint8_t Pin5;
-		uint8_t Pin6;
+	uint8_t Pin6;
         uint8_t Pin7;
 	//Entrada
         uint8_t PinAn4;
@@ -34,12 +35,10 @@ class Cambio
 	int voltPin6;
 	int voltPin7;
 
-	signed char marcha= 1; // Neutro
+	uint8_t marcha= 99; 
 	bool modoAutomatico = true;
 	
-	
-
-	signed char calcularMarcha(int voltSelecao, int voltEngate){
+	uint8_t calcularMarcha(int voltSelecao, int voltEngate){
           //Engate 0.9  -- 3.8
 		 		// Meio 2.8
 		switch (voltSelecao) {
@@ -49,7 +48,7 @@ class Cambio
 					 	marcha= 6; //  5 - Marcha
 					 break;
 					 case 151 ... 280:
-				//	 	marcha= 1;  // NEUTRO
+					// 	marcha= 1;  // NEUTRO
 					 break;
 					 case 281 ... 500: //  ESQUEDA
 					 	marcha= 0; // Ré
@@ -72,10 +71,10 @@ class Cambio
 			 case 281 ... 500: //EM BAIXO
 				switch (voltEngate) {
 					 case 0 ... 150:// DIREITA
-					 	marcha = 2; // 1 - Marcha
+					 	marcha = 2; // 1-Marcha
 					 break;
 					 case 151 ... 280:
-				//	 	marcha = 1;  // NEUTRO
+					//	marcha = 1;  // NEUTRO
 					 break;
 					 case 281 ... 500:  //  ESQUEDA
 					 	marcha = 3; // 2 - Marcha
@@ -90,15 +89,15 @@ class Cambio
 	void liberarReles(){
 
 
-	    digitalWrite(Pin4,HIGH);
-	    digitalWrite(Pin5,HIGH);
-	    digitalWrite(Pin6,HIGH);
-	    digitalWrite(Pin7,HIGH);
+	    digitalWrite(Pin4,LOW);
+	    digitalWrite(Pin5,LOW);
+	    digitalWrite(Pin6,LOW);
+	    digitalWrite(Pin7,LOW);
 
 	}
 	bool alavancaAcionadaParaAutoOuManual(){
-	/*
-	Serial.print(" P-");
+	
+/*
 	Serial.print(mapToVolt(util.estabilizarEntrada(PinAn4)));
 	Serial.print(" S-");
 	Serial.print(mapToVolt(util.estabilizarEntrada(PinAn5)));
@@ -118,20 +117,20 @@ class Cambio
 	bool alavancaAcionadaParaCima(){
 
 	/*
-	Serial.print(" P-");
+	Serial.print(" P4-");
 	Serial.print(mapToVolt(util.estabilizarEntrada(PinAn4)));
-	Serial.print(" S-");
+	Serial.print(" P5-");
 	Serial.print(mapToVolt(util.estabilizarEntrada(PinAn5)));
-	Serial.print(" T-");
+	Serial.print(" P6-");
 	Serial.print(mapToVolt(util.estabilizarEntrada(PinAn6)));
-	Serial.print(" Q-");
+	Serial.print(" P7-");
 	Serial.println(mapToVolt(util.estabilizarEntrada(PinAn7)));
 */
 
 	return  (mapToVolt(util.estabilizarEntrada(PinAn4)) > VOLTAGEM_REFERENCIA  && // pin 5 JOYSTICK
-        	mapToVolt(util.estabilizarEntrada(PinAn5))  < VOLTAGEM_REFERENCIA  &&
-	        mapToVolt(util.estabilizarEntrada(PinAn6))  > VOLTAGEM_REFERENCIA &&
-        	mapToVolt(util.estabilizarEntrada(PinAn7))  < VOLTAGEM_REFERENCIA);
+        	mapToVolt(util.estabilizarEntrada(PinAn5))  < VOLTAGEM_REFERENCIA  &&// pin 4 JOYSTICK
+	        mapToVolt(util.estabilizarEntrada(PinAn6))  > VOLTAGEM_REFERENCIA &&// pin 3 JOYSTICK
+        	mapToVolt(util.estabilizarEntrada(PinAn7))  < VOLTAGEM_REFERENCIA);// pin 2 JOYSTICK
 
 
 	}
@@ -139,10 +138,10 @@ class Cambio
 	bool alavancaAcionadaParaBaixo(){
 
 
-	return  (mapToVolt(util.estabilizarEntrada(PinAn4))> VOLTAGEM_REFERENCIA  &&
-        	mapToVolt(util.estabilizarEntrada(PinAn5))< VOLTAGEM_REFERENCIA  &&
-	        mapToVolt(util.estabilizarEntrada(PinAn6))< VOLTAGEM_REFERENCIA &&
-        	mapToVolt(util.estabilizarEntrada(PinAn7))> VOLTAGEM_REFERENCIA);
+	return  (mapToVolt(util.estabilizarEntrada(PinAn4))> VOLTAGEM_REFERENCIA  && // pin 5 JOYSTICK
+        	mapToVolt(util.estabilizarEntrada(PinAn5))< VOLTAGEM_REFERENCIA  && // pin 4 JOYSTICK
+	        mapToVolt(util.estabilizarEntrada(PinAn6))< VOLTAGEM_REFERENCIA && // pin 3 JOYSTICK
+        	mapToVolt(util.estabilizarEntrada(PinAn7))> VOLTAGEM_REFERENCIA); // pin 2 JOYSTICK
 
 
 	}
@@ -218,13 +217,13 @@ class Cambio
 
 	void mudarParaAutomatico(int apartirDo){
 		
-		if  (apartirDo != N && apartirDo!=R)
+		if  (apartirDo != NEUTRO && apartirDo!=RE)
   			mudarParaManualOuAutomaticoApartirDoD();
 
 	}
 	void mudarParaManual(int apartirDo){
 	 
-	 	if  (apartirDo != N && apartirDo!=R)
+	 	if  (apartirDo != NEUTRO && apartirDo!=RE)
   			mudarParaManualOuAutomaticoApartirDoD();
 
 	}
@@ -233,24 +232,34 @@ class Cambio
 		
   	  	util.bloquear(AGUARDAR_PARA_MUDAR_AUTO_MANUAL);
 		
-        digitalWrite(Pin4,LOW); // pin 5 jostick rele 1 pin 5
-    	digitalWrite(Pin6,LOW);// pin 3 jostick rele 3  pin 7
-        util.bloquear(DURACAO_ACAO);
+        	digitalWrite(Pin5,HIGH); // pin 3 jostick rele 2 1.7v
+    		digitalWrite(Pin7,HIGH);// pin 5 jostick rele 4  3.6v
+        	util.bloquear(DURACAO_ACAO);
 	  	liberarReles();
 		atualizarModoAutoManual();
   	  	util.bloquear(AGUARDAR_PARA_MUDAR_AUTO_MANUAL);
 
 
 	}
-
+	// Pinagem conector joystick : GND X X X X 12V
 	void avancarUmaMarcha(){
 	    util.bloquear(AGUARDAR_PARA_MUDAR_MARCHA);
-	    digitalWrite(Pin4,LOW); // pin 5 jostick - rele 1 pin 5
-	    digitalWrite(Pin5,LOW); // pin 4 jostick - rele 2 pin 6
-	    digitalWrite(Pin6,LOW); // pin 3 jostick - rele 3 pin 7
-	    digitalWrite(Pin7,LOW); // pin 2 jostick - rele 4 pin 8
+	    digitalWrite(Pin4,HIGH); // pin 2 jostick - rele 1  3.6v
+	    digitalWrite(Pin5,HIGH); // pin 3 jostick - rele 2  1.7v
+	    digitalWrite(Pin6,HIGH); // pin 4 jostick - rele 3  1.7v
+	    digitalWrite(Pin7,HIGH); // pin 5 jostick - rele 4  3.6v
 	    util.bloquear(DURACAO_ACAO);
-        liberarReles();
+            liberarReles();
+	    util.bloquear(AGUARDAR_PARA_MUDAR_MARCHA);
+
+	}
+	// Pinagem conector joystick : GND X X X X 12V
+	void reduzirUmaMarcha(){
+	    util.bloquear(AGUARDAR_PARA_MUDAR_MARCHA);
+	    digitalWrite(Pin6,HIGH); // pin 4 jostick - rele 3  1.7v
+	    digitalWrite(Pin7,HIGH); // pin 5 jostick - rele 4  3.6v
+	    util.bloquear(DURACAO_ACAO);
+            liberarReles();
 	    util.bloquear(AGUARDAR_PARA_MUDAR_MARCHA);
 
 	}
@@ -291,11 +300,8 @@ class Cambio
 
 	}
 
-	 signed char obterMarchaEngatada(){
+	 uint8_t obterMarchaEngatada(){
 		 
-		 
-
-
 		if (util.saidaTimer4()){ 
 			int voltSelecao, entradaSelecao; 
 			int voltEngate, entradaEngate; 
@@ -305,16 +311,16 @@ class Cambio
 	    
 		
 			if (entradaEngate>50 && entradaSelecao>50){
-			
-				voltSelecao = map(entradaSelecao, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
-				voltEngate  = map(entradaEngate, 0, 1023, VOLT_MIN_REFERENCIA, VOLT_MAX_REFERENCIA);			
-				Serial.print(" Selecao:" );
-				Serial.print(voltSelecao);
-				Serial.print(" Engate:" );
-				Serial.println(voltEngate);
+
+				voltSelecao = mapToVolt(entradaSelecao);
+				voltEngate  = mapToVolt(entradaEngate);			
+			//	Serial.print(" Selecao:" );
+			//	Serial.print(voltSelecao);
+			//	Serial.print(" Engate:" );
+			//	Serial.println(voltEngate);
 				marcha = calcularMarcha(voltSelecao,voltEngate);
-				Serial.print(" Marcha:" );
-				Serial.println(marcha-1);
+			//	Serial.print(" Marcha:" );
+			//	Serial.println(marcha-1);
 
 
 			}
@@ -351,5 +357,3 @@ class Cambio
 
 	
 };
-
-
