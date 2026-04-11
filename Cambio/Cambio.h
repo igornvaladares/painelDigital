@@ -1,15 +1,17 @@
 #include "Arduino.h"
 #define VOLT_MIN_REFERENCIA 0
 #define VOLT_MAX_REFERENCIA 500
-#define DURACAO_ACAO 500
+#define DURACAO_ACAO 350
 #define VOLTAGEM_REFERENCIA 250 // 2.5 volts
 #define AGUARDAR_PARA_MUDAR_MARCHA 100
 #define AGUARDAR_PARA_MUDAR_AUTO_MANUAL 100
 uint8_t RE = 0;
 uint8_t NEUTRO = 1;
 uint8_t PRIMEIRA = 2;
+uint8_t SEGUNDA = 3;
+uint8_t TERCEIRA = 4;
 uint8_t QUARTA = 5;
-uint8_t QUINTA = 6;
+uint8_t QUINTA = 6; 
 
 class Cambio
 {
@@ -136,7 +138,7 @@ class Cambio
 	}
 
 	bool alavancaAcionadaParaBaixo(){
-
+     
 
 	return  (mapToVolt(util.estabilizarEntrada(PinAn4))> VOLTAGEM_REFERENCIA  && // pin 5 JOYSTICK
         	mapToVolt(util.estabilizarEntrada(PinAn5))< VOLTAGEM_REFERENCIA  && // pin 4 JOYSTICK
@@ -230,14 +232,13 @@ class Cambio
 
 	void mudarParaManualOuAutomaticoApartirDoD(){
 		
-  	  	util.bloquear(AGUARDAR_PARA_MUDAR_AUTO_MANUAL);
-		
-        	digitalWrite(Pin5,HIGH); // pin 3 jostick rele 2 1.7v
-    		digitalWrite(Pin7,HIGH);// pin 5 jostick rele 4  3.6v
-        	util.bloquear(DURACAO_ACAO);
-	  	liberarReles();
-		atualizarModoAutoManual();
-  	  	util.bloquear(AGUARDAR_PARA_MUDAR_AUTO_MANUAL);
+  	   util.bloquear(AGUARDAR_PARA_MUDAR_AUTO_MANUAL);
+		   digitalWrite(Pin5,HIGH); // pin 3 jostick rele 2 1.7v
+    	 digitalWrite(Pin7,HIGH);// pin 5 jostick rele 4  3.6v
+       atualizarModoAutoManual();
+		   util.bloquear(DURACAO_ACAO);
+	  	 liberarReles();
+		   util.bloquear(AGUARDAR_PARA_MUDAR_AUTO_MANUAL);
 
 
 	}
@@ -249,7 +250,7 @@ class Cambio
 	    digitalWrite(Pin6,HIGH); // pin 4 jostick - rele 3  1.7v
 	    digitalWrite(Pin7,HIGH); // pin 5 jostick - rele 4  3.6v
 	    util.bloquear(DURACAO_ACAO);
-            liberarReles();
+        liberarReles();
 	    util.bloquear(AGUARDAR_PARA_MUDAR_MARCHA);
 
 	}
@@ -259,7 +260,7 @@ class Cambio
 	    digitalWrite(Pin6,HIGH); // pin 4 jostick - rele 3  1.7v
 	    digitalWrite(Pin7,HIGH); // pin 5 jostick - rele 4  3.6v
 	    util.bloquear(DURACAO_ACAO);
-            liberarReles();
+        liberarReles();
 	    util.bloquear(AGUARDAR_PARA_MUDAR_MARCHA);
 
 	}
