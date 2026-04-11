@@ -2,8 +2,8 @@
 #include "Util.h"
 #define VALOR_MIN_TEMP_RADIADOR 20
 #define VALOR_MAX_TEMP_RADIADOR 120
-#define  VALOR_ACELERADOR_MIN_REF 59 //0.59V
-#define  VALOR_ACELERADOR_MAX_REF 110 //1.1v
+#define  VALOR_ACELERADOR_MIN_REF 70 //0.77V
+#define  VALOR_ACELERADOR_MAX_REF 120 //1.2v
 #define  VALOR_ACELERADOR_MAX 400 //4.0v
 
 class Motor
@@ -12,10 +12,11 @@ class Motor
 private:
 	Pulso *pulso;
 	Util util;
-	double wKMporH;
+	float wKMporH;
 	float distanciaPercorrida;
 	uint8_t PinTemperaturaAguaRadiador;
 	uint8_t PinAcelerador;
+	uint8_t QUINTA =6;
 
 	int nivelMemoriaTemperatura = 0;
 	const byte PulsesPerRevolution = 1; // Set how many pulses there are on each revolution. Default: 2.
@@ -37,6 +38,7 @@ private:
 
 	int velocidadeAnt = 0;
 	double velocidade100Ant = 0;
+	bool soltouAcelerador=false;
 
 	bool isDesacelerandoPorDesvio(int velocidade, int desvio)
 	{
@@ -78,47 +80,60 @@ public:
 		util.iniciaTimer2(TIMER_2);
 		util.iniciaTimer3(TIMER_3);
 		util.iniciaTimer5(TIMER_2);
+		util.iniciaTimer6(TIMER_6);
 
 	};
 
-	bool isAliviouAcelerador(){
+	bool isAlvoAceleradorParaTrocaDeMarcha(){
 
 		bool retorno = false;
-		Serial.print(" S-");
+		//Serial.print(" S-");
 
-
-		if (util.saidaTimer2())	{
+		if (util.saidaTimer6())	{
+                   soltouAcelerador = false;
+		}
+ 
+		if (util.saidaTimer2() && !soltouAcelerador)	{
                    // Serial.println("Le acelerador :");
 
 		   util.reIniciaTimer2(); 
-	           int nivelAcelerador = util.estabilizarEntrada(PinAcelerador);
+	       int nivelAcelerador = util.estabilizarEntrada(PinAcelerador);
 	  	
 		   int voltAc = map(nivelAcelerador, 0, 1023, 0, 500);			
 
-		   Serial.print("Acele:");
-  		   Serial.print(voltAc);	
+		   //Serial.print("Acele:");
+  		   //Serial.print(voltAc);	
+		  if (voltAc< VALOR_ACELERADOR_MIN_REF ){
+			soltouAcelerador =true;
+			util.reIniciaTimer6(); 
+
+		  }
+		
 	  	  return (voltAc>= VALOR_ACELERADOR_MIN_REF && voltAc<= VALOR_ACELERADOR_MAX_REF);
 
 		}
 		return retorno;
 	}
+	bool isPisandoAcelerador(){
+
+	    int nivelAcelerador = util.estabilizarEntrada(PinAcelerador);
+		  int voltAc = map(nivelAcelerador, 0, 1023, 0, 500);			
+	  	return (voltAc>=VALOR_ACELERADOR_MIN_REF);
+
+	}
 	bool isPisouFundo(){
 
 		bool retorno = false;
-		Serial.print(" S-");
+		//Serial.print(" S-");
 
 
 		if (util.saidaTimer5())	{
-                    Serial.println("Le acelerador :");
+        //  Serial.println("Le acelerador :");
 
 		   util.reIniciaTimer5(); 
-	           int nivelAcelerador = util.estabilizarEntrada(PinAcelerador);
-	  	
-		   int voltAc = map(nivelAcelerador, 0, 1023, 0, 500);			
-
-		   //Serial.print("Acele:");
-  		   //Serial.println(voltAc);	
-	  	  return (voltAc>=VALOR_ACELERADOR_MAX);
+	     int nivelAcelerador = util.estabilizarEntrada(PinAcelerador);
+	  	 int voltAc = map(nivelAcelerador, 0, 1023, 0, 500);			
+       return (voltAc>=VALOR_ACELERADOR_MAX);
 
 		}
 		return retorno;
@@ -126,17 +141,14 @@ public:
 	bool isEstabilizouVelocidade(double velocidade)
 	{
 
-		double velocidade100 = velocidade*100;
-
+		double velocidade100 = velocidade;
 		bool retorno = false;
-
-		if (util.saidaTimer3())
-		{
+		if (util.saidaTimer3()){
 
 			util.reIniciaTimer3();
-			double percentualReducao = 100- velocidade100Ant/(velocidade100*100);
+			double aceleracao =  ((velocidade100Ant - velocidade100) * 2); // 0.5 segundos = Timer3
 			velocidade100Ant = velocidade100;
-			return (percentualReducao ) < 2;
+			return fabs(aceleracao) < 1.2; // 1.2km/h
 		
 		}
 		return retorno;
@@ -198,77 +210,30 @@ public:
 		return average;
 	}
 
-	double obterVelocidade()
+	float obterVelocidade(uint8_t marcha)
 	{
 		if (util.saidaTimer1())
 		{
+			float FATOR_CORRECAO_MARCHA = (marcha == QUINTA) ? 1.276 : 1;
 			util.reIniciaTimer1();
 			unsigned int countPulso = pulso->getPulsoVelocidade();
-			unsigned char PULSO_POR_VOLTA = 15;
-			float DIAMETRO_RODA = 0.63;
-			float FATOR_MS_KMH = 3.4;
+			int PULSO_POR_VOLTA = 29; //16
+			float DIAMETRO_RODA = 0.6573;
+			float FATOR_MS_KMH = 3.6;
 			// distanciaPercorrida +=(countPulso/PULSO_POR_VOLTA)*PI;
 			pulso->reiniciarVelocidade();
-			float rpmV;
-			float hz;
-			rpmV = (float)countPulso * 60 / PULSO_POR_VOLTA;
-			hz = rpmV / 60;
-			wKMporH = (float)PI * hz * DIAMETRO_RODA * FATOR_MS_KMH;
-			if (wKMporH < 4.0){
+			// * 2 TRANFOMAA 500ms em hz 
+			wKMporH = (countPulso * 2) * (PI * DIAMETRO_RODA * FATOR_MS_KMH)/ PULSO_POR_VOLTA;
+			
+			wKMporH = wKMporH * FATOR_CORRECAO_MARCHA;
+			if (wKMporH < 3.0){
 			   wKMporH=0;
 			}
+			
 		}
+		//wKMporH++;
+
 		return wKMporH;
 	}
-/*
-	int obterTemperaturaAguaRadiador()
-	{
 
-		if (util.saidaTimer2())
-		{
-			// OBS: Meio do Tanque a partir de 0,74 Volts e ventoinha liga a partir de 0.626v	(95 graus)
-
-			// float voltPorUnidade = 0.004887586;
-			int nivelAtual;
-
-			nivelAtual = util.estabilizarEntrada(PinTemperaturaAguaRadiador);
-			// Serial.println("pintemperatura");
-			// Serial.print(temperatura);
-
-			//	403un -> 47 Graus
-			//	127un - 97 Graus
-			//	_________
-			// 	276 - 50
-			//	 X  - 1
-			// x=  5.5
-			// 1024 / 5.62 = 186
-			// nivelAtual = 403;
-
-			// Diferenca 65
-			if (nivelAtual > 0)
-			{
-				nivelAtual = map(nivelAtual, 1023, 0, 0, 186) - 65;
-				// nivelAtual = map(nivelAtual, 1023,0 ,0, 182)-75;
-				if (nivelMemoriaTemperatura == 0)
-					nivelMemoriaTemperatura = nivelAtual;
-				if (nivelAtual < nivelMemoriaTemperatura)
-				{
-					// Oscilando para baixo
-					nivelMemoriaTemperatura--;
-				}
-				else
-				{
-					if (nivelAtual > nivelMemoriaTemperatura)
-					{
-						// Oscilando para cima
-						nivelMemoriaTemperatura++;
-					}
-				}
-			}
-
-			util.reIniciaTimer2();
-		}
-		return nivelMemoriaTemperatura;
-	}
-*/
 };
