@@ -5,7 +5,7 @@ class Pulso : public Interrupt{
     	uint8_t PinRotacao;
     	uint8_t PinVelocidade;
     	volatile unsigned long arrayPulso[3]={0};
-    	long countPulsoVelocidade;
+    	volatile long countPulsoVelocidade;
 	const unsigned long ZeroTimeout = 100000;  // For high response time, a good value would be 100000.
 	volatile unsigned long LastTimeWeMeasured;  // Stores the last time we measured a pulse so we can calculate the period.
 	volatile unsigned long PeriodBetweenPulses = ZeroTimeout+1000;  // Stores the period between pulses in microseconds.
@@ -36,7 +36,9 @@ class Pulso : public Interrupt{
      }    
 
     long reiniciarVelocidade(){
-	 countPulsoVelocidade=0;
+	interrompePulso();
+	countPulsoVelocidade=0;
+	iniciaPulso();
      }    
     void interrompePulso(){
 	detach(PinRotacao);
@@ -75,10 +77,12 @@ class Pulso : public Interrupt{
 
 	}else if (interruptNum==PinVelocidade){
 		countPulsoVelocidade++;
+		//Serial.print(" PULSO VEL:");
+		//Serial.println(countPulsoVelocidade);
+
 	}
 
     }
 
     	
 };
-
